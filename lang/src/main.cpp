@@ -5,7 +5,7 @@
 
 int main()
 {
-	auto code_process_result = codeprocessor::parse_program("hello");
+	auto code_process_result = codeprocessor::parse_program("hello world=s");
 	if (std::holds_alternative<codeprocessor::CodeProcessorError>(code_process_result))
 	{
 		codeprocessor::CodeProcessorError code_process_err = std::get<codeprocessor::CodeProcessorError>(code_process_result);

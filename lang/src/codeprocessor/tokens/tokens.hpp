@@ -6,8 +6,10 @@
 namespace tokens
 {
     enum TokenType {
+        EQUALS_SIGN,
+        IDENTIFIER,
         WHITESPACE,
-        END_OF_INPUT
+        END_OF_INPUT,
     };
 
     class Token
