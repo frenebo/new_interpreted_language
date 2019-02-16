@@ -12,7 +12,6 @@ namespace parser::statement_series
 
         while (tokens[start_idx + consumed_count].token_type() != stop_token)
         {
-            unsigned long out_statement_container_consumed;
             auto statement_container_parse_result =
                 parser::statements::parse_statement_container(tokens, start_idx + consumed_count);
             

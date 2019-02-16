@@ -8,8 +8,8 @@ namespace parser
     {
     public:
         ParseResult(T contained, unsigned long consumed_count)
-        : _contained(contained),
-        _consumed_count(consumed_count)
+        : _consumed_count(consumed_count),
+        _contained(contained)
         {
         }
         
