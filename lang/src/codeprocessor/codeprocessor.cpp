@@ -7,7 +7,7 @@
 
 namespace codeprocessor
 {
-    std::variant<syntaxtree::statement_series::StatementSeries, CodeProcessorError>
+    std::variant<syntax_tree::statement_series::StatementSeries, CodeProcessorError>
     parse_program(const std::string & text)
     {
         auto lex_result = lexer::Lexer().lex_text(text);
@@ -31,7 +31,7 @@ namespace codeprocessor
         }
         else
         {
-            return std::get<syntaxtree::statement_series::StatementSeries>(parse_result);
+            return std::get<parser::ParseResult<syntax_tree::statement_series::StatementSeries>>(parse_result).contained();
         }
     }
 

@@ -1,10 +1,9 @@
-
 #include "./statementseries.hpp"
 
-
-namespace syntaxtree::statement_series
+namespace syntax_tree::statement_series
 {
-    StatementSeries::StatementSeries()
+    StatementSeries::StatementSeries(std::vector<statements::StatementContainer> statements)
+    : _statements(statements)
     {
     }
 }

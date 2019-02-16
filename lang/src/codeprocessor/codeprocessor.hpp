@@ -17,7 +17,7 @@ namespace codeprocessor
         std::string _message;
     };
     
-    std::variant<syntaxtree::statement_series::StatementSeries, CodeProcessorError>
+    std::variant<syntax_tree::statement_series::StatementSeries, CodeProcessorError>
     parse_program(const std::string & text);
 }
 
