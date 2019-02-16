@@ -8,7 +8,9 @@ namespace lexer
     Lexer::Lexer()
     {
         _simple_tok_strings = {
-            { "=", tokens::TokenType::EQUALS_SIGN }
+            { "=", tokens::TokenType::EQUALS_SIGN },
+            { "+", tokens::TokenType::PLUS_SIGN },
+            { ";", tokens::TokenType::SEMICOLON },
         };
     }
     
@@ -72,7 +74,7 @@ namespace lexer
         return tokens;
     }
     
-    std::variant<tokens::Token, LexErrorMessage> Lexer::try_match_tok(const std::string & text, unsigned long start_idx) const
+    std::variant<tokens::Token, LexErrorMessage> Lexer::try_match_tok(const std::string & text, const unsigned long start_idx) const
     {
         std::optional<tokens::Token> longest_match;
 
@@ -80,6 +82,7 @@ namespace lexer
         potential_matches.push_back(longest_simple_tok_match(text, start_idx));
         potential_matches.push_back(try_match_identifier(text, start_idx));
         potential_matches.push_back(try_match_whitespace(text, start_idx));
+        potential_matches.push_back(try_match_int_or_float(text, start_idx));
 
         for (std::optional<tokens::Token> potential_match : potential_matches)
         {
@@ -104,7 +107,62 @@ namespace lexer
         }
     }
 
-    std::optional<tokens::Token> Lexer::try_match_identifier(const std::string & text, unsigned long start_idx) const
+    std::optional<tokens::Token> Lexer::try_match_int_or_float(const std::string & text, const unsigned long start_idx) const
+    {
+        bool seen_period = false;
+        unsigned long digits_before_period = 0;
+        unsigned long digits_after_period = 0;
+
+        unsigned long consumed_count = 0;
+        while (consumed_count < text.length() - start_idx)
+        {
+            char next_char = text[start_idx + consumed_count];
+            
+            if (next_char == '.')
+            {
+                // only one period can be in a number
+                if (seen_period) break;
+                else
+                {
+                    consumed_count++;
+                    seen_period = true;
+                }
+            }
+            else if (isdigit(next_char))
+            {
+                consumed_count++;
+
+                if (seen_period) digits_after_period++;
+                else             digits_before_period++;
+            }
+            // the number is over if the next char is neither a period nor a digit
+            else
+            {
+                break;
+            }
+        }
+
+        // if no digits were seen
+        if (digits_before_period == 0 && digits_after_period == 0)
+        {
+            return std::optional<tokens::Token>();
+        }
+
+        std::string matched_str = text.substr(start_idx, consumed_count);
+
+        // if there was a period somewhere, this is a float
+        if (seen_period)
+        {
+            return tokens::Token(tokens::TokenType::FLOAT_NUM, matched_str);
+        }
+        // if there was no period, this is an int
+        else
+        {
+            return tokens::Token(tokens::TokenType::INTEGER_NUM, matched_str);
+        }
+    }
+
+    std::optional<tokens::Token> Lexer::try_match_identifier(const std::string & text, const unsigned long start_idx) const
     {
         // the first character of an identifier must be a letter
         if (!isalpha(text[start_idx])) return std::optional<tokens::Token>();
@@ -124,7 +182,7 @@ namespace lexer
         return tokens::Token(tokens::TokenType::IDENTIFIER, matched_str);
     }
 
-    std::optional<tokens::Token> Lexer::try_match_whitespace(const std::string & text, unsigned long start_idx) const
+    std::optional<tokens::Token> Lexer::try_match_whitespace(const std::string & text, const unsigned long start_idx) const
     {
         unsigned long match_length = 0;
 
@@ -147,7 +205,7 @@ namespace lexer
         }
     }
 
-    std::optional<tokens::Token> Lexer::longest_simple_tok_match(const std::string & text, unsigned long start_idx) const
+    std::optional<tokens::Token> Lexer::longest_simple_tok_match(const std::string & text, const unsigned long start_idx) const
     {
         std::optional<tokens::Token> longest_match;
         

@@ -7,6 +7,10 @@ namespace tokens
 {
     enum TokenType {
         EQUALS_SIGN,
+        PLUS_SIGN,
+        SEMICOLON,
+        INTEGER_NUM,
+        FLOAT_NUM,
         IDENTIFIER,
         WHITESPACE,
         END_OF_INPUT,
