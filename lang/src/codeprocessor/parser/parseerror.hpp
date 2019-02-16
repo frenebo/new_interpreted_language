@@ -7,10 +7,11 @@ namespace parser
 {
     class ParseError
     {
-        std::string _message;
     public:
         ParseError(std::string message);
         const std::string & message() const;
+    private:
+        std::string _message;
     };
 }
 

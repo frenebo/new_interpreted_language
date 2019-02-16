@@ -18,13 +18,14 @@ namespace tokens
 
     class Token
     {
-        TokenType _token_type;
-        std::string _content_text;
     public:
         Token(TokenType token_type, std::string content_text);
 
         TokenType token_type() const;
         const std::string & content_text() const;
+    private:
+        TokenType _token_type;
+        std::string _content_text;
     };
 }
 

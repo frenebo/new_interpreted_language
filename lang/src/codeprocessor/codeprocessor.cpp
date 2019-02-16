@@ -34,11 +34,6 @@ namespace codeprocessor
             return std::get<syntaxtree::statement_series::StatementSeries>(parse_result);
         }
     }
-    
-    void helloworld()
-    {
-        std::cout << "Hello, World!\n";
-    }
 
     CodeProcessorError::CodeProcessorError(std::string message)
     : _message(message)
