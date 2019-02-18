@@ -6,7 +6,7 @@
 
 int main()
 {
-	auto code_process_result = codeprocessor::parse_program("something + somethingelse;");
+	auto code_process_result = codeprocessor::parse_program("a - b + c + -something + somethingelse;");
 	if (std::holds_alternative<codeprocessor::CodeProcessorError>(code_process_result))
 	{
 		codeprocessor::CodeProcessorError code_process_err = std::get<codeprocessor::CodeProcessorError>(code_process_result);
