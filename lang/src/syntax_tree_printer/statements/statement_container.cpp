@@ -3,13 +3,6 @@
 
 namespace syntax_tree_printer::statements
 {
-    void print_compound_expression_statement(const syntax_tree::statements::CompoundExpressionStatement & compound_exp_statement, unsigned int indents)
-    {
-        std::cout << std::string(indents, ' ') << "Compound Expression Statement:\n";
-
-        syntax_tree_printer::compound_expression::print_compound_expression(compound_exp_statement.compound_exp());
-    }
-    
     void print_statement_container(const syntax_tree::statements::StatementContainer & statement_container, unsigned int indents)
     {
         // std::cout << std::string(indents, ' ') << "Statement Container: ";
@@ -21,6 +14,10 @@ namespace syntax_tree_printer::statements
                 std::get<syntax_tree::statements::CompoundExpressionStatement>(contained),
                 indents
             );
+        }
+        else
+        {
+            std::cout << std::string(indents, ' ') << "Unimplemented statement print\n";
         }
         // if statement_container.contained_statement
     }
