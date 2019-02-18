@@ -1,16 +1,22 @@
 #include <iostream>
 #include <variant>
 
-#include "./codeprocessor/codeprocessor.hpp"
+#include "./code_processor/code_processor.hpp"
+#include "./syntax_tree_printer/statement_series/statement_series.hpp"
 
 int main()
 {
-	auto code_process_result = codeprocessor::parse_program("something = 10.0;");
+	auto code_process_result = codeprocessor::parse_program("something + somethingelse;");
 	if (std::holds_alternative<codeprocessor::CodeProcessorError>(code_process_result))
 	{
 		codeprocessor::CodeProcessorError code_process_err = std::get<codeprocessor::CodeProcessorError>(code_process_result);
 		std::cout << "Code processing error: " << code_process_err.message() << "\n";
 	}
+
+	auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(code_process_result);
+	
+	syntax_tree_printer::statement_series::print_statement_series(statement_series, 0);
+	
 	return 0;
 }
 
