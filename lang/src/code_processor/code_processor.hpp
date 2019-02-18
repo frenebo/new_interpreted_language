@@ -6,7 +6,7 @@
 
 #include "../syntax_tree/statement_series/statement_series.hpp"
 
-namespace codeprocessor
+namespace code_processor
 {
     class CodeProcessorError
     {

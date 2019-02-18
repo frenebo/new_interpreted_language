@@ -5,7 +5,7 @@
 #include "./lexer/lexer.hpp"
 #include "./parser/statement_series/statement_series.hpp"
 
-namespace codeprocessor
+namespace code_processor
 {
     std::variant<syntax_tree::statement_series::StatementSeries, CodeProcessorError>
     parse_program(const std::string & text)
