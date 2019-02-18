@@ -1,5 +1,5 @@
-#ifndef STATEMENTS_HPP
-#define STATEMENTS_HPP
+#ifndef SYNTAX_TREE_STATEMENTS_HPP
+#define SYNTAX_TREE_STATEMENTS_HPP
 
 #include "../compound_expression/compound_expression.hpp"
 #include <variant>

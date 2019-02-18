@@ -1,5 +1,5 @@
-#ifndef STATEMENTSERIES_HPP
-#define STATEMENTSERIES_HPP
+#ifndef SYNTAX_TREE_STATEMENTSERIES_HPP
+#define SYNTAX_TREE_STATEMENTSERIES_HPP
 
 #include <vector>
 #include "../statements/statements.hpp"
