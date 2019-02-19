@@ -54,6 +54,12 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "__tree": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "*.tcc": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "unordered_map": "cpp",
+        "fstream": "cpp",
+        "sstream": "cpp"
     }
 }

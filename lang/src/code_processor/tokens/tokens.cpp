@@ -10,6 +10,8 @@ namespace tokens
             return "equals sign";
         case PLUS_SIGN:
             return "plus sign";
+        case MINUS_SIGN:
+            return "minus sign";
         case SEMICOLON:
             return "semicolon";
         case INTEGER_NUM:
@@ -22,8 +24,8 @@ namespace tokens
             return "whitespace";
         case END_OF_INPUT:
             return "end of input";
-        case MINUS_SIGN:
-            return "minus sign";
+        default:
+            return "unimplemented token string";
         }
     }
     

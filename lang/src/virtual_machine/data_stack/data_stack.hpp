@@ -1,5 +1,9 @@
-#ifndef VIRTUAL_MACHINE_DATA_STACK
-#define VIRTUAL_MACHINE_DATA_STACK
+#ifndef VM_DATA_STACK
+#define VM_DATA_STACK
+
+#include <vector>
+
+#include "../data_container/data_container.hpp"
 
 namespace virtual_machine::data_stack
 {
@@ -7,7 +11,11 @@ namespace virtual_machine::data_stack
     {
     public:
         DataStack();
+        void push(data_container::DataContainer data_container);
+        data_container::DataContainer pop();
+        size_t size() const;
     private:
+        std::vector<data_container::DataContainer> _stack;
     };
 }
 
