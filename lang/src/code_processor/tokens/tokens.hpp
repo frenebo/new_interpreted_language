@@ -13,6 +13,7 @@ namespace tokens
         INTEGER_NUM,
         FLOAT_NUM,
         IDENTIFIER,
+        PRINT_KEYWORD,
         WHITESPACE,
         END_OF_INPUT,
     };

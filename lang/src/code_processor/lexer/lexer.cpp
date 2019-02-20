@@ -12,6 +12,7 @@ namespace lexer
             { "-", tokens::TokenType::MINUS_SIGN },
             { "+", tokens::TokenType::PLUS_SIGN },
             { ";", tokens::TokenType::SEMICOLON },
+            { "print", tokens::TokenType::PRINT_KEYWORD },
         };
     }
     

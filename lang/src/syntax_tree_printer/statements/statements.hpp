@@ -5,6 +5,7 @@
 
 namespace syntax_tree_printer::statements
 {
+    void print_print_statement(const syntax_tree::statements::PrintStatement &, unsigned int indents);
     void print_compound_expression_statement(const syntax_tree::statements::CompoundExpressionStatement & compound_exp_statement, unsigned int indents);
     void print_statement_container(const syntax_tree::statements::StatementContainer &, unsigned int indents);
 }

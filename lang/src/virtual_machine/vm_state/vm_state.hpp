@@ -9,7 +9,7 @@ namespace virtual_machine::vm_state
     class VirtualMachineState
     {
     public:
-        VirtualMachineState(std::vector<instructions::InstructionContainer>);
+        VirtualMachineState(std::vector<bytecode::instructions::InstructionContainer> instructions);
     private:
         virtual_machine::data_stack::DataStack _data_stack;
         instruction_memory::InstructionMemory _instruction_memory;

@@ -3,17 +3,18 @@
 
 #include <vector>
 
-#include "../../instructions/instructions.hpp"
+#include "../../bytecode/instructions/instructions.hpp"
 
 namespace virtual_machine::instruction_memory
 {
     class InstructionMemory
     {
     public:
-        InstructionMemory(std::vector<instructions::InstructionContainer> instructions);
-        
+        InstructionMemory(std::vector<bytecode::instructions::InstructionContainer> instructions);
+        const std::vector<bytecode::instructions::InstructionContainer> & instructions() const;
     private:
-        std::vector<instructions::InstructionContainer> _instructions;
+        std::vector<bytecode::instructions::InstructionContainer> _instructions;
+        unsigned long _position;
     };
 }
 

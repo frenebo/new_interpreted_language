@@ -22,6 +22,8 @@ namespace tokens
             return "identifier";
         case WHITESPACE:
             return "whitespace";
+        case PRINT_KEYWORD:
+            return "print keyword";
         case END_OF_INPUT:
             return "end of input";
         default:

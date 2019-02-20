@@ -9,11 +9,13 @@ int main()
 	auto code_process_result = code_processor::parse_program(
 		"a - b + c + -something + somethingelse;"
 		"hello;"
+		"print a;"
 	);
 	if (std::holds_alternative<code_processor::CodeProcessorError>(code_process_result))
 	{
 		code_processor::CodeProcessorError code_process_err = std::get<code_processor::CodeProcessorError>(code_process_result);
 		std::cout << "Code processing error: " << code_process_err.message() << "\n";
+		return 1;
 	}
 
 	auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(code_process_result);

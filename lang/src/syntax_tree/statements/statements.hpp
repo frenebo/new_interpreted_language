@@ -6,6 +6,15 @@
 
 namespace syntax_tree::statements
 {
+    class PrintStatement
+    {
+    public:
+        PrintStatement(syntax_tree::compound_expression::CompoundExpression exp_to_print);
+        const syntax_tree::compound_expression::CompoundExpression & exp_to_print() const;
+    private:
+        syntax_tree::compound_expression::CompoundExpression _exp_to_print;
+    };
+    
     class CompoundExpressionStatement
     {
     public:
@@ -18,7 +27,7 @@ namespace syntax_tree::statements
     class StatementContainer
     {
     public:
-        typedef std::variant<CompoundExpressionStatement> VariantContainedStatement;
+        typedef std::variant<CompoundExpressionStatement, PrintStatement> VariantContainedStatement;
         
         StatementContainer(VariantContainedStatement contained_statement);
         

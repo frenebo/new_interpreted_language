@@ -2,8 +2,13 @@
 
 namespace virtual_machine::instruction_memory
 {
-    InstructionMemory::InstructionMemory(std::vector<instructions::InstructionContainer> instructions)
+    InstructionMemory::InstructionMemory(std::vector<bytecode::instructions::InstructionContainer> instructions)
     : _instructions(instructions)
     {
+    }
+
+    const std::vector<bytecode::instructions::InstructionContainer> & InstructionMemory::instructions() const
+    {
+        return _instructions;
     }
 }

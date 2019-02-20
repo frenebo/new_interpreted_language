@@ -15,6 +15,13 @@ namespace syntax_tree_printer::statements
                 indents
             );
         }
+        else if (std::holds_alternative<syntax_tree::statements::PrintStatement>(contained))
+        {
+            print_print_statement(
+                std::get<syntax_tree::statements::PrintStatement>(contained),
+                indents
+            );
+        }
         else
         {
             std::cout << std::string(indents, ' ') << "Unimplemented statement print\n";
