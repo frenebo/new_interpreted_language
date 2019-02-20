@@ -5,8 +5,8 @@ namespace bytecode::instructions
     InstructionContainer::InstructionContainer(
         unsigned long line_label,
         VariantInstruction contained_instruction)
-    : _line_label(line_label),
-    _contained_instruction(contained_instruction)
+    : _contained_instruction(contained_instruction),
+    _line_label(line_label)
     {
     }
 

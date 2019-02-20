@@ -1,13 +1,13 @@
 #include <iostream>
 #include <variant>
 
-#include "./code_processor.hpp"
+#include "./front_end.hpp"
 #include "./lexer/lexer.hpp"
 #include "./parser/statement_series/statement_series.hpp"
 
-namespace code_processor
+namespace front_end
 {
-    std::variant<syntax_tree::statement_series::StatementSeries, CodeProcessorError>
+    std::variant<syntax_tree::statement_series::StatementSeries, FrontEndError>
     parse_program(const std::string & text)
     {
         auto lex_result = lexer::Lexer().lex_text(text);
@@ -17,7 +17,7 @@ namespace code_processor
         {
             lexer::LexErrorMessage lex_error_mssg = std::get<lexer::LexErrorMessage>(lex_result);
             
-            return CodeProcessorError(lex_error_mssg.reason());
+            return FrontEndError(lex_error_mssg.reason());
         }
 
         std::vector<tokens::Token> tokens = std::get<std::vector<tokens::Token>>(lex_result);
@@ -27,7 +27,7 @@ namespace code_processor
         if (std::holds_alternative<parser::ParseError>(parse_result))
         {
             parser::ParseError parse_err = std::get<parser::ParseError>(parse_result);
-            return CodeProcessorError(parse_err.message());
+            return FrontEndError(parse_err.message());
         }
         else
         {
@@ -35,12 +35,12 @@ namespace code_processor
         }
     }
 
-    CodeProcessorError::CodeProcessorError(std::string message)
+    FrontEndError::FrontEndError(std::string message)
     : _message(message)
     {
     }
 
-    const std::string & CodeProcessorError::message() const
+    const std::string & FrontEndError::message() const
     {
         return _message;
     }

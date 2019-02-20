@@ -5,8 +5,9 @@
 
 namespace bytecode::instructions
 {
-    class StackIntegerAdd {};
-    class StackIntegerSubtract {};
+    // class StackInteger
+    class StackAdd {};
+    class StackSubtract {};
     
     class StackIntegerPushConst {
     public:
@@ -15,13 +16,17 @@ namespace bytecode::instructions
     private:
         int _value;
     };
+
+    class StackPrint {};
     
     class InstructionContainer
     {
     public:
         typedef std::variant<
-            StackIntegerAdd,
-            StackIntegerSubtract
+            StackAdd,
+            StackSubtract,
+            StackIntegerPushConst,
+            StackPrint
         > VariantInstruction;
 
         InstructionContainer(unsigned long line_label, VariantInstruction contained_instruction);
