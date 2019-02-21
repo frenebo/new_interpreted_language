@@ -35,7 +35,9 @@ namespace virtual_machine::machine_state
         std::optional<MachineRuntimeError> execute_stack_print();
         std::optional<MachineRuntimeError> execute_stack_int_push_const(int int_to_push);
         std::optional<MachineRuntimeError> execute_stack_subtract();
+        std::optional<MachineRuntimeError> execute_stack_multiply();
         std::optional<MachineRuntimeError> execute_stack_store_to_variable(const std::string & var_name);
+        std::optional<MachineRuntimeError> execute_stack_pop();
     };
 }
 

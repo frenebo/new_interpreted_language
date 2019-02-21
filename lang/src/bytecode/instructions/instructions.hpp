@@ -3,11 +3,13 @@
 
 #include <string>
 #include <variant>
+#include <optional>
 
 namespace bytecode::instructions
 {
     class StackAdd {};
     class StackSubtract {};
+    class StackMultiply {};
     
     class StackIntegerPushConst {
     public:
@@ -15,6 +17,14 @@ namespace bytecode::instructions
         int value() const;
     private:
         int _value;
+    };
+
+    class StackFloatPushConst {
+    public:
+        StackFloatPushConst(float value);
+        float value() const;
+    private:
+        float _value;
     };
 
     class StackPrint {};
@@ -35,25 +45,32 @@ namespace bytecode::instructions
         std::string _var_name;
     };
 
+    class StackPop {};
+
     class InstructionContainer
     {
     public:
         typedef std::variant<
             StackAdd,
             StackSubtract,
+            StackMultiply,
             StackIntegerPushConst,
+            StackFloatPushConst,
             StackPrint,
             StackStoreToVariable,
-            StackLoadFromVariable
+            StackLoadFromVariable,
+            StackPop
         > VariantInstruction;
 
-        InstructionContainer(unsigned long line_label, VariantInstruction contained_instruction);
+        InstructionContainer(VariantInstruction contained_instruction);
+        InstructionContainer(VariantInstruction, unsigned long line_label);
 
         const VariantInstruction & contained_instruction() const;
-        unsigned long line_label() const;
+        std::optional<unsigned long> line_label() const;
+        void set_line_label(unsigned long line_label);
     private:
         VariantInstruction _contained_instruction;
-        unsigned long _line_label;
+        std::optional<unsigned long> _line_label;
     };
 }
 

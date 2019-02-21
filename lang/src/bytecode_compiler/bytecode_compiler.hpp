@@ -22,7 +22,21 @@ namespace bytecode_compiler
         
         std::vector<bytecode::instructions::InstructionContainer>
         compile_print_statement(const syntax_tree::statements::PrintStatement & print_statement);
-        // syntax_tree::statements::
+
+        std::vector<bytecode::instructions::InstructionContainer>
+        instructions_to_evaluate_compound_exp_to_stack(const syntax_tree::compound_expression::CompoundExpression & compound_exp);
+
+        std::vector<bytecode::instructions::InstructionContainer>
+        instructions_to_evaluate_possibly_prefixed_terminal_to_stack(const syntax_tree::compound_expression::PossiblyPrefixedTerminal & possibly_prefixed_terminal_expression);
+
+        std::vector<bytecode::instructions::InstructionContainer>
+        instructions_to_evaluate_terminal_to_stack(const syntax_tree::terminal_expressions::TerminalExpressionContainer & terminal_expression);
+
+        std::vector<bytecode::instructions::InstructionContainer>
+        instruction_to_evaluate_number_expression_to_stack(const syntax_tree::terminal_expressions::NumberExpression & number_expression);
+
+        std::vector<bytecode::instructions::InstructionContainer>
+        instruction_to_evaluate_identifier_to_stack(const syntax_tree::terminal_expressions::IdentifierExpression & identifier_expression);
     };
 }
 

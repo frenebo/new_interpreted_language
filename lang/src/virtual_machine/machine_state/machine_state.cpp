@@ -50,9 +50,47 @@ namespace virtual_machine::machine_state
 
             return execute_stack_store_to_variable(var_name);
         }
+        else if (std::holds_alternative<bytecode::instructions::StackMultiply>(current_instruction))
+        {
+            return execute_stack_multiply();
+        }
         else
         {
             return std::optional<MachineRuntimeError>("UNIMPLEMENTED INSTRUCTION");
+        }
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_multiply()
+    {
+        auto rhs_container_optional = _data_stack.pop();
+        auto lhs_container_optional = _data_stack.pop();
+
+        if (!(rhs_container_optional.has_value() && lhs_container_optional.has_value()))
+        {
+            return MachineRuntimeError("Stack error - ran out of values");
+        }
+
+        auto rhs_contained = rhs_container_optional->contained();
+        auto lhs_contained = lhs_container_optional->contained();
+
+        if (std::holds_alternative<data_container::IntegerContainer>(rhs_contained) &&
+            std::holds_alternative<data_container::IntegerContainer>(lhs_contained))
+        {
+            int rhs_int = std::get<data_container::IntegerContainer>(rhs_contained).value();
+            int lhs_int = std::get<data_container::IntegerContainer>(lhs_contained).value();
+            
+            auto new_int_container = data_container::IntegerContainer(rhs_int * lhs_int);
+            auto value_container = data_container::DataContainer(new_int_container);
+            
+            _data_stack.push(value_container);
+        
+            _instruction_memory.set_position(_instruction_memory.position() + 1);
+            
+            return std::optional<MachineRuntimeError>();
+        }
+        else
+        {
+            return MachineRuntimeError("Incompatible or unsupported variables for multiplication");
         }
     }
 
@@ -175,6 +213,20 @@ namespace virtual_machine::machine_state
         else
         {
             return MachineRuntimeError("Incompatible or unsupported values for subtraction");
+        }
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_pop()
+    {
+        auto stack_val_container_optional = _data_stack.pop();
+
+        if (!stack_val_container_optional.has_value())
+        {
+            return MachineRuntimeError("Stack error - ran out of values");
+        }
+        else
+        {
+            return std::optional<MachineRuntimeError>();
         }
     }
 
