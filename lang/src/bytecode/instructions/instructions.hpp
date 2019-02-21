@@ -1,11 +1,11 @@
 #ifndef BYTECODE_INSTRUCTIONS_HPP
 #define BYTECODE_INSTRUCTIONS_HPP
 
+#include <string>
 #include <variant>
 
 namespace bytecode::instructions
 {
-    // class StackInteger
     class StackAdd {};
     class StackSubtract {};
     
@@ -18,7 +18,23 @@ namespace bytecode::instructions
     };
 
     class StackPrint {};
-    
+
+    class StackStoreToVariable {
+    public:
+        StackStoreToVariable(const std::string & var_name);
+        const std::string & var_name() const;
+    private:
+        std::string _var_name;
+    };
+
+    class StackLoadFromVariable {
+    public:
+        StackLoadFromVariable(const std::string & var_name);
+        const std::string & var_name() const;
+    private:
+        std::string _var_name;
+    };
+
     class InstructionContainer
     {
     public:
@@ -26,7 +42,9 @@ namespace bytecode::instructions
             StackAdd,
             StackSubtract,
             StackIntegerPushConst,
-            StackPrint
+            StackPrint,
+            StackStoreToVariable,
+            StackLoadFromVariable
         > VariantInstruction;
 
         InstructionContainer(unsigned long line_label, VariantInstruction contained_instruction);

@@ -11,8 +11,6 @@ int main()
 {
 	auto code_process_result = front_end::parse_program(
 		"a - b + c + -something + somethingelse;"
-		"hello;"
-		"print a;"
 	);
 	if (std::holds_alternative<front_end::FrontEndError>(code_process_result))
 	{
