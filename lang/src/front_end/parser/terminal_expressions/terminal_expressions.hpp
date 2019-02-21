@@ -16,6 +16,9 @@ namespace parser::terminal_expressions
 
     std::variant<ParseResult<syntax_tree::terminal_expressions::IdentifierExpression>, ParseError>
     parse_identifier_expression(const std::vector<tokens::Token> & tokens, unsigned long start_idx);
+
+    std::variant<ParseResult<syntax_tree::terminal_expressions::NumberExpression>, ParseError>
+    parse_number_expression(const std::vector<tokens::Token> & tokens, unsigned long start_idx);
 }
 
 #endif

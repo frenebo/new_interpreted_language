@@ -10,8 +10,10 @@
 int main()
 {
 	auto code_process_result = front_end::parse_program(
-		"a - b + c + -something + somethingelse;"
+		"a - b + c + c - something + somethingelse;"
+		"print a;"
 	);
+
 	if (std::holds_alternative<front_end::FrontEndError>(code_process_result))
 	{
 		front_end::FrontEndError code_process_err = std::get<front_end::FrontEndError>(code_process_result);
@@ -20,7 +22,7 @@ int main()
 	}
 
 	auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(code_process_result);
-	
+
 	syntax_tree_printer::statement_series::print_statement_series(statement_series, 0);
 
 	std::vector<bytecode::instructions::InstructionContainer> instructions;
@@ -55,7 +57,7 @@ int main()
 
 	std::clock_t start;
     double duration;
-	start= std::clock();
+	start = std::clock();
 
 	auto machine_result = virtual_machine::runner::run_bytecode(instructions);
 	if (machine_result.has_value())
@@ -66,6 +68,6 @@ int main()
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 
     std::cout<< "Duration: "<< duration <<'\n';
-	
+
 	return 0;
 }
