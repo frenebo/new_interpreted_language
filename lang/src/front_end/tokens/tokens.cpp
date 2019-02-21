@@ -12,6 +12,10 @@ namespace tokens
             return "plus sign";
         case MINUS_SIGN:
             return "minus sign";
+        case ASTERISK:
+            return "asterisk";
+        case FORWARD_SLASH:
+            return "forward slash";
         case SEMICOLON:
             return "semicolon";
         case INTEGER_NUM:

@@ -12,7 +12,7 @@ namespace virtual_machine::runner
         while (!done)
         {
             std::optional<machine_state::MachineRuntimeError> possible_error =
-                machine_state.execute_instruction();
+                machine_state.execute_next_instruction();
             
             if (possible_error.has_value())
             {

@@ -22,6 +22,8 @@ namespace bytecode_compiler
             
             instructions.insert(instructions.end(), statement_instructions.begin(), statement_instructions.end());
         }
+
+        return instructions;
     }
 
     std::vector<bytecode::instructions::InstructionContainer>
@@ -37,6 +39,27 @@ namespace bytecode_compiler
         {
             return compile_print_statement(std::get<syntax_tree::statements::PrintStatement>(contained_statement));
         }
+        else if (std::holds_alternative<syntax_tree::statements::AssignmentStatement>(contained_statement))
+        {
+            return compile_assignment_statement(std::get<syntax_tree::statements::AssignmentStatement>(contained_statement));
+        }
+        else
+        {
+            std::cout << "Unimplemented statement compile\n";
+            exit(1);
+        }
+    }
+
+    std::vector<bytecode::instructions::InstructionContainer>
+    BytecodeCompiler::compile_assignment_statement(const syntax_tree::statements::AssignmentStatement & assignment_statement)
+    {
+        auto instructions = instructions_to_evaluate_compound_exp_to_stack(assignment_statement.assigned_exp());
+
+        instructions.push_back(bytecode::instructions::InstructionContainer(
+            bytecode::instructions::StackStoreToVariable(assignment_statement.var_name())
+        ));
+
+        return instructions;
     }
 
     std::vector<bytecode::instructions::InstructionContainer>
@@ -61,6 +84,8 @@ namespace bytecode_compiler
         instructions.push_back(bytecode::instructions::InstructionContainer(
             bytecode::instructions::StackPrint()
         ));
+
+        return instructions;
     }
 
     int op_type_priority(syntax_tree::compound_expression::OperatorType op_type)
@@ -70,24 +95,16 @@ namespace bytecode_compiler
             case syntax_tree::compound_expression::OperatorType::MINUS_OP:
             case syntax_tree::compound_expression::OperatorType::PLUS_OP:
                 return 0;
+            case syntax_tree::compound_expression::OperatorType::MULT_OP:
+            case syntax_tree::compound_expression::OperatorType::DIV_OP:
+                return 1;
         }
-    }
-
-    bool index_op_type_pair_sort(
-        std::pair<unsigned int, syntax_tree::compound_expression::OperatorType> i,
-        std::pair<unsigned int, syntax_tree::compound_expression::OperatorType> j)
-    {
-        int i_priority = op_type_priority(i.second);
-        int j_priority = op_type_priority(j.second);
-
-        // i stays before j if it is equivalent, or if it has a higher priority
-        return i >= j;
     }
 
     std::vector<bytecode::instructions::InstructionContainer>
     BytecodeCompiler::instructions_to_evaluate_compound_exp_to_stack(const syntax_tree::compound_expression::CompoundExpression & compound_exp)
     {
-        std::vector<const syntax_tree::compound_expression::PossiblyPrefixedTerminal &> possibly_prefixed_terminals;
+        std::vector<syntax_tree::compound_expression::PossiblyPrefixedTerminal> possibly_prefixed_terminals;
         std::vector<syntax_tree::compound_expression::OperatorType> op_types;
         
         possibly_prefixed_terminals.push_back(compound_exp.start_exp());
@@ -99,123 +116,103 @@ namespace bytecode_compiler
             op_types.push_back(suffix.op_type());
         }
 
-        std::vector<std::pair<unsigned int, syntax_tree::compound_expression::OperatorType>> sorted_op_types_with_indices;
-        for (unsigned int i = 0; i < op_types.size(); ++i)
-        {
-            sorted_op_types_with_indices.push_back(
-                std::pair<unsigned int, syntax_tree::compound_expression::OperatorType>(i, op_types[i])
-            );
-        }
-
-        // this orders the operators, highest priority first and lowest priority last. Each item
-        // contains the original index of the operator in the expression.
-        // So, the expression a + b * c would have the give these sorted op types with indices:
-        // [
-        // 1, multiplication
-        // 0, addition 
-        // ]
-        std::stable_sort(sorted_op_types_with_indices.begin(), sorted_op_types_with_indices.end(), index_op_type_pair_sort);
-
-        // std::vector<bytecode::instructions::InstructionContainer> 
-
         std::vector<bytecode::instructions::InstructionContainer> instructions;
         
-        // push first terminal to stack
+        // create instructions to push first terminal to stack
         std::vector<bytecode::instructions::InstructionContainer> first_terminal_instructions =
             instructions_to_evaluate_possibly_prefixed_terminal_to_stack(possibly_prefixed_terminals[0]);
-        
+        // insert instructions to push first terminal to stack
         instructions.insert(instructions.end(), first_terminal_instructions.begin(), first_terminal_instructions.end());
 
-        /**
-         * NOTE ABOUT THE EVALUATION OF COMPOUND EXPRESSIONS
-         * 
-         * in this expression: 1 + 5*9, it's necessary to execute the multiplication operation
-         * before the addition operation.
-         * This is what the compiled code does:
-         * When 1 is on the stack and it is time to push 5 to the stack,
-         * the addition operation needs to wait for the multiplication operation (5*9)
-         * to finish executing. So, the operations would be,
-         * 1 Load 1 to stack
-         * # stack: 1
-         * 2 Load 5 to stack
-         * # stack: 1, 5
-         * 3 Load 9 to stack
-         * # stack: 1, 5, 9
-         * 4 multiply stack
-         * # stack: 1, 45
-         * 5 add stack
-         * # stack: 46
-         * The way it is decided whether an operation needs to be postponed until another
-         * operation has been completed (in this case, the addition is postponed
-         * until the multiplication has taken place) is whether the current
-         * operation has more priority than the next operation. The priorities
-         * is determined by order of operations (exponents, multiplication/division, addition/subraction),
-         * and if there is two operations are equivalent in the order of operations, the left one
-         * has higher priority. So, in the expression
-         * a + b + c * d * e + f * g,
-         * the priorities are:
-         * a + b + c * d * e + f * g,
-         *   2   1   5   4   0   3
-         * With higher numbers under the operations indicating higher priority.
-         * 
-         * Things start with a loaded to the stack.
-         * 
-         * B is loaded to the stack. The postponed operations stack is empty, so it is left alone.
-         * The priority of the operation before b (2) is higher than the priority of the
-         * operation before c (1). B operation has a priority higher
-         * than c operation,  so the addition operation occurs.
-         * 
-         * C is loaded to the stack. The postponed operations stack is empty, so it is left alone.
-         * The priority of the operaiton before c (1) is lower than the priority of the
-         * operation before d (5). C operation has a priority LOWER
-         * than d operation, so the addition operation is postponed, pushed onto the postponed
-         * operation list.
-         * 
-         * D is loaded onto the stack. The postponed operations stack has at the end an
-         * operation with the priority 1, which is lower than the priority of the operation
-         * before d (5), so the stack is left alone.
-         * The priority of the operation before d (5) is higher than the priority of the
-         * operation before e (4). D operation has a priority higher
-         * than e operation, so the multiplication operation occurs.
-         * 
-         * E is loaded onto the stack. The postponed operations stack has at the end an
-         * operation with the priority 1, which is lower than the priority of the operation
-         * before e (4), so the stack is left alone.
-         * The priority of the operation before e (4) is higher than the priority of the
-         * operation before f (0). E operation has a priority higher
-         * than f operation, so the multiplication operation occurs.
-         * 
-         * F is loaded onto the stack. The postponed operations stack has at the end an
-         * operation with the priority 1, which is HIGHER than the priority of the operation before f (0),
-         * so the last item on the postponed operations stack is removed and executed.
-         * This check is performed again - but the stack is empty, so it is left alone. However,
-         * if there were still operations on the postponed stack, those operations would be
-         * removed and continued as long as they had priorities higher than the priority of the
-         * operation before f (0).
-         * The priority of the operation before f (0) is lower than the priority of the
-         * operation before g (3). F operation has a priority lower
-         * than g operation, so the operation is postponed, pushed onto the postponed operation list.
-         * 
-         * G is loaded onto the stack. The postponed operations stack has at the end an
-         * operation with priority 0, which is lower then the priority of the operation before g (3),
-         * so the stack is left alone.
-         * There is no operation after g's operation, so the operation before g occurs.
-         * 
-         * There are no more terminals (a, b, c, d, f, g), so operations are removed from the end
-         * of the postponed stack and executed until the postponed stack is empty.
-         * 
-         * What is left is the evaluated result of a compound expression using order of operations.
-         */
-
-
+        std::vector<syntax_tree::compound_expression::OperatorType> postponed_ops;
         
-        for (int instruction_idx = 0; instruction_idx < op_types.size(); instruction_idx++)
+        for (unsigned int operator_idx = 0; operator_idx < op_types.size(); operator_idx++)
         {
             // push this terminal to stack
             std::vector<bytecode::instructions::InstructionContainer> evaluate_terminal_instructions =
-                instructions_to_evaluate_possibly_prefixed_terminal_to_stack(possibly_prefixed_terminals[instruction_idx + 1]);
+                instructions_to_evaluate_possibly_prefixed_terminal_to_stack(possibly_prefixed_terminals[operator_idx + 1]);
             
             instructions.insert(instructions.end(), evaluate_terminal_instructions.begin(), evaluate_terminal_instructions.end());
+            
+            // priority of this operator
+            int this_op_priority = op_type_priority(op_types[operator_idx]);
+
+            if (postponed_ops.size() != 0)
+            {
+                int last_postponed_priority = postponed_ops.back();
+
+                // execute all postponed if the last has an equal (left-to-right precendence)
+                // or higher priority than the current
+                if (last_postponed_priority >= this_op_priority)
+                {
+                    while (postponed_ops.size() != 0)
+                    {
+                        instructions.push_back(
+                            instruction_for_stack_operation(postponed_ops.back())
+                        );
+                        postponed_ops.pop_back();
+                    }
+                }
+            }
+
+            if (operator_idx != op_types.size() - 1)
+            {
+                int next_op_priority = op_type_priority(op_types[operator_idx + 1]);
+
+                if (this_op_priority < next_op_priority)
+                {
+                    postponed_ops.push_back(op_types[operator_idx]);
+                    continue;
+                }
+            }
+            
+            instructions.push_back(instruction_for_stack_operation(op_types[operator_idx]));
+        }
+
+        // add instructions for postponed ops while these exist
+        while (postponed_ops.size() != 0)
+        {
+            instructions.push_back(
+                instruction_for_stack_operation(postponed_ops.back())
+            );
+            postponed_ops.pop_back();
+        }
+
+        return instructions;
+    }
+    
+    bytecode::instructions::InstructionContainer
+    BytecodeCompiler::instruction_for_stack_operation(syntax_tree::compound_expression::OperatorType op_type)
+    {
+        if (op_type == syntax_tree::compound_expression::OperatorType::DIV_OP)
+        {
+            return bytecode::instructions::InstructionContainer(
+                bytecode::instructions::StackDivide()
+            );
+        }
+        else if (op_type == syntax_tree::compound_expression::OperatorType::MINUS_OP)
+        {
+            return bytecode::instructions::InstructionContainer(
+                bytecode::instructions::StackSubtract()
+            );
+        }
+        else if (op_type == syntax_tree::compound_expression::OperatorType::MULT_OP)
+        {
+            return bytecode::instructions::InstructionContainer(
+                bytecode::instructions::StackMultiply()
+            );
+        }
+        else if (op_type == syntax_tree::compound_expression::OperatorType::PLUS_OP)
+        {
+            return bytecode::instructions::InstructionContainer(
+                bytecode::instructions::StackAdd()
+            );
+        }
+        else
+        {
+            std::cout << "Unimplemented operation type\n";
+            // placeholder
+            exit(1);
         }
     }
 
@@ -227,7 +224,7 @@ namespace bytecode_compiler
         auto possible_prefix_type = possibly_prefixed_terminal_expression.possible_prefix_type();
         if (possible_prefix_type.has_value())
         {
-            if (*possible_prefix_type == syntax_tree::compound_expression::PrefixType::MINUS_PREFIX)
+            if ((*possible_prefix_type) == syntax_tree::compound_expression::PrefixType::MINUS_PREFIX)
             {
                 // multiply by negative one
                 instructions.push_back(bytecode::instructions::InstructionContainer(

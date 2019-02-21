@@ -17,6 +17,14 @@ namespace parser::compound_expression
         {
             op_type = syntax_tree::compound_expression::OperatorType::MINUS_OP;
         }
+        else if (next_token_type == tokens::TokenType::ASTERISK)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::MULT_OP;
+        }
+        else if (next_token_type == tokens::TokenType::FORWARD_SLASH)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::DIV_OP;
+        }
         else
         {
             return ParseError("Unexpected token " + tokens::tok_type_to_str(next_token_type));

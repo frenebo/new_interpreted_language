@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "./statement_series.hpp"
 #include "../statements/statements.hpp"
 
@@ -27,7 +29,8 @@ namespace parser::statement_series
                 consumed_count += parse_result.consumed_count();
             }
         }
-        
+
+        std::cout << "now done\n";
         return ParseResult(syntax_tree::statement_series::StatementSeries(statement_containers), consumed_count);
     }
 }

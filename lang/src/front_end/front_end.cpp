@@ -19,7 +19,7 @@ namespace front_end
             
             return FrontEndError(lex_error_mssg.reason());
         }
-
+        
         std::vector<tokens::Token> tokens = std::get<std::vector<tokens::Token>>(lex_result);
 
         auto parse_result = parser::statement_series::parse_statement_series(tokens, 0, tokens::TokenType::END_OF_INPUT);

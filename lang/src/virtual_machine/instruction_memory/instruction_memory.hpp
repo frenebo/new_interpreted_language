@@ -10,7 +10,11 @@ namespace virtual_machine::instruction_memory
     class InstructionMemory
     {
     public:
+        InstructionMemory();
         InstructionMemory(std::vector<bytecode::instructions::InstructionContainer> instructions);
+        
+        void replace_instructions(std::vector<bytecode::instructions::InstructionContainer> instructions);
+        
         const std::vector<bytecode::instructions::InstructionContainer> & instructions() const;
         unsigned long position() const;
         void set_position(unsigned long new_pos);

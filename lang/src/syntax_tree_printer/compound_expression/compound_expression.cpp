@@ -22,6 +22,14 @@ namespace syntax_tree_printer::compound_expression
             {
                 std::cout << std::string(indents + 1, ' ') << "Plus Operator\n";
             }
+            else if (suffix.op_type() == syntax_tree::compound_expression::OperatorType::MULT_OP)
+            {
+                std::cout << std::string(indents + 1, ' ') << "Multiplication Operator\n";
+            }
+            else if (suffix.op_type() == syntax_tree::compound_expression::OperatorType::DIV_OP)
+            {
+                std::cout << std::string(indents + 1, ' ') << "Division Operator\n";
+            }
             else
             {
                 std::cout << std::string(indents + 1, ' ') << "Unimplemented operator print\n";

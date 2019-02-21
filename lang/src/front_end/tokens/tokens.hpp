@@ -9,6 +9,8 @@ namespace tokens
         EQUALS_SIGN,
         PLUS_SIGN,
         MINUS_SIGN,
+        ASTERISK,
+        FORWARD_SLASH,
         SEMICOLON,
         INTEGER_NUM,
         FLOAT_NUM,

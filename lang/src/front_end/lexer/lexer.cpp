@@ -11,6 +11,8 @@ namespace lexer
             { "=", tokens::TokenType::EQUALS_SIGN },
             { "-", tokens::TokenType::MINUS_SIGN },
             { "+", tokens::TokenType::PLUS_SIGN },
+            { "*", tokens::TokenType::ASTERISK },
+            { "/", tokens::TokenType::FORWARD_SLASH },
             { ";", tokens::TokenType::SEMICOLON },
             { "print", tokens::TokenType::PRINT_KEYWORD },
         };

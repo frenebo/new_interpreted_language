@@ -10,6 +10,7 @@ namespace bytecode::instructions
     class StackAdd {};
     class StackSubtract {};
     class StackMultiply {};
+    class StackDivide {};
     
     class StackIntegerPushConst {
     public:
@@ -54,6 +55,7 @@ namespace bytecode::instructions
             StackAdd,
             StackSubtract,
             StackMultiply,
+            StackDivide,
             StackIntegerPushConst,
             StackFloatPushConst,
             StackPrint,

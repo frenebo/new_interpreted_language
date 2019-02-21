@@ -4,6 +4,14 @@
 
 namespace virtual_machine::machine_state
 {
+    MachineState::MachineState()
+    : _instruction_memory()
+    {
+        _done = true;
+        _data_stack = data_stack::DataStack();
+        _local_variable_memory = local_variable_memory::LocalVariableMemory();
+    }
+    
     MachineState::MachineState(std::vector<bytecode::instructions::InstructionContainer> instructions)
     : _instruction_memory(instructions)
     {
@@ -12,7 +20,13 @@ namespace virtual_machine::machine_state
         _local_variable_memory = local_variable_memory::LocalVariableMemory();
     }
 
-    std::optional<MachineRuntimeError> MachineState::execute_instruction()
+    void MachineState::replace_instructions(std::vector<bytecode::instructions::InstructionContainer> instructions)
+    {
+        _done = false;
+        _instruction_memory.replace_instructions(instructions);
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_next_instruction()
     {
         if (_instruction_memory.position() >= _instruction_memory.instructions().size())
         {
@@ -54,10 +68,32 @@ namespace virtual_machine::machine_state
         {
             return execute_stack_multiply();
         }
+        else if (std::holds_alternative<bytecode::instructions::StackLoadFromVariable>(current_instruction))
+        {
+            std::string var_name = std::get<bytecode::instructions::StackLoadFromVariable>(current_instruction).var_name();
+
+            return execute_stack_load_from_variable(var_name);
+        }
         else
         {
             return std::optional<MachineRuntimeError>("UNIMPLEMENTED INSTRUCTION");
         }
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_load_from_variable(const std::string & var_name)
+    {
+        auto variable_value = _local_variable_memory.get_variable(var_name);
+
+        if (!variable_value.has_value())
+        {
+            return MachineRuntimeError("No variable with name \"" + var_name + "\" defined");
+        }
+
+        _data_stack.push(*variable_value);
+        
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
     }
 
     std::optional<MachineRuntimeError> MachineState::execute_stack_multiply()
@@ -106,6 +142,8 @@ namespace virtual_machine::machine_state
         auto val_container = *stack_val_container_optional;
 
         _local_variable_memory.set_variable(var_name, val_container);
+        
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
 
         return std::optional<MachineRuntimeError>();
     }
