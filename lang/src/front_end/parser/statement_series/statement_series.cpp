@@ -30,7 +30,6 @@ namespace parser::statement_series
             }
         }
 
-        std::cout << "now done\n";
         return ParseResult(syntax_tree::statement_series::StatementSeries(statement_containers), consumed_count);
     }
 }

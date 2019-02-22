@@ -40,6 +40,11 @@ namespace virtual_machine::local_variable_memory
 
     void LocalVariableMemory::set_variable(std::string var_name, data_container::DataContainer variable_value)
     {
-        _variable_data.insert(std::pair<std::string, data_container::DataContainer>(var_name, variable_value));
-    } 
+        auto find_var = _variable_data.find(var_name);
+        if (find_var != _variable_data.end())
+        {
+            _variable_data.erase(find_var);
+        }
+        _variable_data.insert(std::make_pair(var_name, variable_value));
+    }
 }
