@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include "./bytecode/instructions/instructions.hpp"
 #include "./front_end/front_end.hpp"
@@ -8,44 +9,52 @@
 #include "./bytecode_printer/bytecode_printer.hpp"
 
 
-int main()
+int main(int argc, char *argv[])
 {
-	virtual_machine::machine_state::MachineState state = virtual_machine::machine_state::MachineState();
+	if (argc != 2)
+    {
+        std::cout << "Program takes one argument: input file name\n";
+        return 1;
+    }
 
-	while (true)
+    std::string file_name = std::string(argv[1]);
+
+    std::ifstream input_file = std::ifstream(file_name);
+
+    std::string input_text;
+    if (input_file.is_open())
+    {
+        input_file.seekg(0, std::ios::end);
+        input_text.reserve(input_file.tellg());
+        input_file.seekg(0, std::ios::beg);
+
+        input_text.assign(
+            std::istreambuf_iterator<char>(input_file),
+            std::istreambuf_iterator<char>()
+        );
+    }
+    else
+    {
+        std::cout << "Could not open file \"" << file_name << "\"\n";
+        return 1;
+    }
+
+	auto try_parse = front_end::parse_program(input_text);
+
+	if (std::holds_alternative<front_end::FrontEndError>(try_parse))
 	{
-		std::cout << "> ";
-		std::string input_line;
-		std::getline(std::cin, input_line);
-		auto try_parse = front_end::parse_program(input_line);
-
-		if (std::holds_alternative<front_end::FrontEndError>(try_parse))
-		{
-			front_end::FrontEndError err = std::get<front_end::FrontEndError>(try_parse);
-			std::cout << "Syntax error: " << err.message() << "\n";
-			continue;
-		}
-
-		auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(try_parse);
-		syntax_tree_printer::statement_series::print_statement_series(statement_series, 0);
-		
-		auto instructions = bytecode_compiler::BytecodeCompiler().compile_statement_series(statement_series);
-
-		bytecode_printer::print_instructions(instructions);
-		state.replace_instructions(instructions);
-
-		while (!state.machine_done())
-		{
-			std::optional<virtual_machine::machine_state::MachineRuntimeError> problem =
-				state.execute_next_instruction();
-			
-			if (problem.has_value())
-			{
-				std::cout << "Runtime error: " << problem->message() << "\n";
-				break;
-			}
-		}
+		front_end::FrontEndError err = std::get<front_end::FrontEndError>(try_parse);
+		std::cout << "Syntax Error: " << err.message() << "\n";
+		return 1;
 	}
+
+	auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(try_parse);
+	syntax_tree_printer::statement_series::print_statement_series(statement_series, 0);
+
+	auto instructions = bytecode_compiler::BytecodeCompiler().compile_statement_series(statement_series);
+	bytecode_printer::print_instructions(instructions);
+
+	virtual_machine::runner::run_bytecode(instructions);
 
 	return 0;
 }

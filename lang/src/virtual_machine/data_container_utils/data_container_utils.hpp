@@ -17,6 +17,9 @@ namespace virtual_machine::data_container_utils
     };
 
     std::variant<bool, ConversionError> convert_data_to_bool(virtual_machine::data_container::DataContainer data_container);
+    
+    std::variant<bool, data_container::DataContainer> add_data_containers(data_container::DataContainer lhs, data_container::DataContainer rhs);
+    std::variant<bool, data_container::DataContainer> subtract_data_containers(data_container::DataContainer lhs, data_container::DataContainer rhs);
 }
 
 #endif

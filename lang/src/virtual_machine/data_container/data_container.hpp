@@ -2,6 +2,7 @@
 #define VM_DATA_CONTAINER_HPP
 
 #include <variant>
+#include <string>
 
 namespace virtual_machine::data_container
 {
@@ -33,6 +34,8 @@ namespace virtual_machine::data_container
     private:
         VariantDataContainer _contained;
     };
+
+    std::string data_container_type_string(DataContainer);
 }
 
 #endif
