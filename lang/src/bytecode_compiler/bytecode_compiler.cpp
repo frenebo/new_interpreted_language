@@ -11,7 +11,7 @@ namespace bytecode_compiler
     }
 
     std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::compile_program(const syntax_tree::statement_series::StatementSeries & statement_series)
+    BytecodeCompiler::compile_statement_series(const syntax_tree::statement_series::StatementSeries & statement_series)
     {
         std::vector<bytecode::instructions::InstructionContainer> instructions;
 
@@ -43,11 +43,45 @@ namespace bytecode_compiler
         {
             return compile_assignment_statement(std::get<syntax_tree::statements::AssignmentStatement>(contained_statement));
         }
+        else if (std::holds_alternative<syntax_tree::statements::IfStatement>(contained_statement))
+        {
+            return compile_if_statement(std::get<syntax_tree::statements::IfStatement>(contained_statement));
+        }
         else
         {
             std::cout << "Unimplemented statement compile\n";
             exit(1);
         }
+    }
+
+    std::vector<bytecode::instructions::InstructionContainer>
+    BytecodeCompiler::compile_if_statement(const syntax_tree::statements::IfStatement & if_statement)
+    {
+        auto condition_evaluate_instructions =
+            instructions_to_evaluate_compound_exp_to_stack(if_statement.if_condition());
+        
+        auto if_body_instructions =
+            compile_statement_series(if_statement.body_statement_series());
+        
+        std::vector<bytecode::instructions::InstructionContainer> instructions;
+        instructions.reserve(
+            condition_evaluate_instructions.size() +
+            2 +
+            if_body_instructions.size()
+        );
+        // first, evaluate the condition
+        instructions.insert(instructions.end(), condition_evaluate_instructions.begin(), condition_evaluate_instructions.end());
+        // Skips the jump to the end of the if statement if the if condition is truthy
+        instructions.push_back(bytecode::instructions::InstructionContainer(
+            bytecode::instructions::SkipNextInstructionIfStackValueTruthy()
+        ));
+        // go to the instruction right after the end of the if body
+        instructions.push_back(bytecode::instructions::InstructionContainer(
+            bytecode::instructions::GotoRelativePosition(if_body_instructions.size() + 1)
+        ));
+        instructions.insert(instructions.end(), if_body_instructions.begin(), if_body_instructions.end());
+
+        return instructions;
     }
 
     std::vector<bytecode::instructions::InstructionContainer>

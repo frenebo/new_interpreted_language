@@ -43,6 +43,8 @@ namespace virtual_machine::machine_state
         std::optional<MachineRuntimeError> execute_stack_store_to_variable(const std::string & var_name);
         std::optional<MachineRuntimeError> execute_stack_pop();
         std::optional<MachineRuntimeError> execute_stack_load_from_variable(const std::string & var_name);
+        std::optional<MachineRuntimeError> execute_skip_next_instruction_if_stack_value_matches_bool(bool);
+        std::optional<MachineRuntimeError> execute_goto_relative_instruction_location(int relative_pos);
     };
 }
 

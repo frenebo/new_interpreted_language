@@ -10,26 +10,6 @@
 
 int main()
 {
-	// auto code_process_result = front_end::parse_program(
-	// 	"print 1123;"
-	// );
-
-	// if (std::holds_alternative<front_end::FrontEndError>(code_process_result))
-	// {
-	// 	front_end::FrontEndError code_process_err = std::get<front_end::FrontEndError>(code_process_result);
-	// 	std::cout << "Code processing error: " << code_process_err.message() << "\n";
-	// 	return 1;
-	// }
-
-	// auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(code_process_result);
-
-	// // syntax_tree_printer::statement_series::print_statement_series(statement_series, 0);
-
-	// auto instructions = bytecode_compiler::BytecodeCompiler().compile_program(statement_series);
-
-	// bytecode_printer::print_instructions(instructions);
-
-	// std::cout << "\nstarting execution\n";
 	virtual_machine::machine_state::MachineState state = virtual_machine::machine_state::MachineState();
 
 	while (true)
@@ -49,7 +29,7 @@ int main()
 		auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(try_parse);
 		syntax_tree_printer::statement_series::print_statement_series(statement_series, 0);
 		
-		auto instructions = bytecode_compiler::BytecodeCompiler().compile_program(statement_series);
+		auto instructions = bytecode_compiler::BytecodeCompiler().compile_statement_series(statement_series);
 
 		bytecode_printer::print_instructions(instructions);
 		state.replace_instructions(instructions);

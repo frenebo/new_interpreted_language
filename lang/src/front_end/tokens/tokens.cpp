@@ -6,6 +6,14 @@ namespace tokens
     {
         switch (tok_type)
         {
+        case OPEN_PARENTHESIS:
+            return "open parenthesis";
+        case CLOSE_PARENTHESIS:
+            return "close parenthesis";
+        case OPEN_BRACE:
+            return "open brace";
+        case CLOSE_BRACE:
+            return "close brace";
         case EQUALS_SIGN:
             return "equals sign";
         case PLUS_SIGN:
@@ -28,6 +36,8 @@ namespace tokens
             return "whitespace";
         case PRINT_KEYWORD:
             return "print keyword";
+        case IF_KEYWORD:
+            return "if keyword";
         case END_OF_INPUT:
             return "end of input";
         default:

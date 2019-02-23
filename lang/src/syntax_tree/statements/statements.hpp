@@ -1,8 +1,15 @@
 #ifndef SYNTAX_TREE_STATEMENTS_HPP
 #define SYNTAX_TREE_STATEMENTS_HPP
 
-#include "../compound_expression/compound_expression.hpp"
 #include <variant>
+#include <memory>
+
+#include "../compound_expression/compound_expression.hpp"
+
+namespace syntax_tree::statement_series
+{
+    class StatementSeries;
+}
 
 namespace syntax_tree::statements
 {
@@ -34,6 +41,22 @@ namespace syntax_tree::statements
     private:
         syntax_tree::compound_expression::CompoundExpression _compound_exp;
     };
+
+    class IfStatement
+    {
+    public:
+        IfStatement(syntax_tree::compound_expression::CompoundExpression if_condition, syntax_tree::statement_series::StatementSeries body_statement_series);
+        const syntax_tree::compound_expression::CompoundExpression & if_condition() const;
+        const syntax_tree::statement_series::StatementSeries & body_statement_series() const;
+
+        ~IfStatement();
+        IfStatement(const IfStatement &);
+
+        IfStatement & operator=(const IfStatement & rhs);
+    private:
+        syntax_tree::compound_expression::CompoundExpression _if_condition;
+        std::unique_ptr<syntax_tree::statement_series::StatementSeries> _body_statement_series;
+    };
     
     class StatementContainer
     {
@@ -41,6 +64,7 @@ namespace syntax_tree::statements
         typedef std::variant<
             CompoundExpressionStatement,
             PrintStatement,
+            IfStatement,
             AssignmentStatement
         > VariantContainedStatement;
         

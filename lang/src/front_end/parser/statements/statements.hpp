@@ -20,6 +20,9 @@ namespace parser::statements
     std::variant<ParseResult<syntax_tree::statements::AssignmentStatement>, ParseError>
     parse_assignment_statement(const std::vector<tokens::Token> & tokens, unsigned long start_idx);
 
+    std::variant<ParseResult<syntax_tree::statements::IfStatement>, ParseError>
+    parse_if_statement(const std::vector<tokens::Token> & tokens, unsigned long start_idx);
+
     // std::variant<ParseResult<syntax_tree::statements::ComplexExpressionStatement>, ParseError>
     // parse_complex_expression_statement(const std::vector<tokens::Token> & tokens, unsigned long start_idx);
 }

@@ -6,6 +6,10 @@
 namespace tokens
 {
     enum TokenType {
+        OPEN_PARENTHESIS,
+        CLOSE_PARENTHESIS,
+        OPEN_BRACE,
+        CLOSE_BRACE,
         EQUALS_SIGN,
         PLUS_SIGN,
         MINUS_SIGN,
@@ -16,6 +20,7 @@ namespace tokens
         FLOAT_NUM,
         IDENTIFIER,
         PRINT_KEYWORD,
+        IF_KEYWORD,
         WHITESPACE,
         END_OF_INPUT,
     };

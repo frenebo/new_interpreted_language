@@ -14,7 +14,12 @@ namespace lexer
             { "*", tokens::TokenType::ASTERISK },
             { "/", tokens::TokenType::FORWARD_SLASH },
             { ";", tokens::TokenType::SEMICOLON },
+            { "(", tokens::TokenType::OPEN_PARENTHESIS },
+            { ")", tokens::TokenType::CLOSE_PARENTHESIS },
+            { "{", tokens::TokenType::OPEN_BRACE },
+            { "}", tokens::TokenType::CLOSE_BRACE },
             { "print", tokens::TokenType::PRINT_KEYWORD },
+            { "if", tokens::TokenType::IF_KEYWORD },
         };
     }
     

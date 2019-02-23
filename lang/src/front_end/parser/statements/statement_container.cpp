@@ -25,6 +25,24 @@ namespace parser::statements
             }
         }
 
+        if (next_tok_type == tokens::TokenType::IF_KEYWORD)
+        {
+            auto try_parse_if_statement = parse_if_statement(tokens, start_idx);
+            if (std::holds_alternative<ParseResult<syntax_tree::statements::IfStatement>>(try_parse_if_statement))
+            {
+                auto if_statement_result =
+                    std::get<ParseResult<syntax_tree::statements::IfStatement>>(try_parse_if_statement);
+                
+                auto statement_container = syntax_tree::statements::StatementContainer(if_statement_result.contained());
+
+                return ParseResult<syntax_tree::statements::StatementContainer>(statement_container, if_statement_result.consumed_count());
+            }
+            else
+            {
+                return std::get<ParseError>(try_parse_if_statement);
+            }
+        }
+
         if (next_tok_type == tokens::TokenType::IDENTIFIER &&
             tokens[start_idx + 1].token_type() == tokens::TokenType::EQUALS_SIGN)
         {

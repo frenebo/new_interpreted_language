@@ -48,6 +48,18 @@ namespace bytecode::instructions
 
     class StackPop {};
 
+    class SkipNextInstructionIfStackValueTruthy {};
+    class SkipNextInstructionIfStackValueFalsy {};
+
+    class GotoRelativePosition {
+    public:
+        // move_distance can be negative to move backwards, positive to move forwards.
+        GotoRelativePosition(int move_distance);
+        int move_distance() const;
+    private:
+        int _move_distance;
+    };
+
     class InstructionContainer
     {
     public:
@@ -61,7 +73,10 @@ namespace bytecode::instructions
             StackPrint,
             StackStoreToVariable,
             StackLoadFromVariable,
-            StackPop
+            StackPop,
+            GotoRelativePosition,
+            SkipNextInstructionIfStackValueFalsy,
+            SkipNextInstructionIfStackValueTruthy
         > VariantInstruction;
 
         InstructionContainer(VariantInstruction contained_instruction);

@@ -56,5 +56,22 @@ namespace bytecode_printer
             std::string var_name = std::get<bytecode::instructions::StackStoreToVariable>(contained_instruction).var_name();
             std::cout << "STORE VAR: " << var_name << "\n";
         }
+        else if (std::holds_alternative<bytecode::instructions::GotoRelativePosition>(contained_instruction))
+        {
+            int move_dist = std::get<bytecode::instructions::GotoRelativePosition>(contained_instruction).move_distance();
+            std::cout << "GOTO RELATIVE POSITION: " << move_dist << "\n";
+        }
+        else if (std::holds_alternative<bytecode::instructions::SkipNextInstructionIfStackValueTruthy>(contained_instruction))
+        {
+            std::cout << "SKIP NEXT INSTRUCTION IF STACK VALUE TRUTHY\n";
+        }
+        else if (std::holds_alternative<bytecode::instructions::SkipNextInstructionIfStackValueTruthy>(contained_instruction))
+        {
+            std::cout << "SKIP NEXT INSTRUCTION IF STACK VALUE FALSY\n";
+        }
+        else
+        {
+            std::cout << "unimplemented bytecode instruction print\n";
+        }
     }
 }

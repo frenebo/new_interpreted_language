@@ -12,7 +12,7 @@ namespace bytecode_compiler
         BytecodeCompiler();
         
         std::vector<bytecode::instructions::InstructionContainer>
-        compile_program(const syntax_tree::statement_series::StatementSeries & statement_series);
+        compile_statement_series(const syntax_tree::statement_series::StatementSeries & statement_series);
     private:
         std::vector<bytecode::instructions::InstructionContainer>
         compile_statement_container(const syntax_tree::statements::StatementContainer & statement_container);
@@ -22,6 +22,9 @@ namespace bytecode_compiler
         
         std::vector<bytecode::instructions::InstructionContainer>
         compile_print_statement(const syntax_tree::statements::PrintStatement & print_statement);
+
+        std::vector<bytecode::instructions::InstructionContainer>
+        compile_if_statement(const syntax_tree::statements::IfStatement & if_statement);
 
         std::vector<bytecode::instructions::InstructionContainer>
         compile_assignment_statement(const syntax_tree::statements::AssignmentStatement & assignment_statement);

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "./machine_state.hpp"
+#include "../data_container_utils/data_container_utils.hpp"
 
 
 namespace virtual_machine::machine_state
@@ -74,10 +75,62 @@ namespace virtual_machine::machine_state
 
             return execute_stack_load_from_variable(var_name);
         }
+        else if (std::holds_alternative<bytecode::instructions::SkipNextInstructionIfStackValueTruthy>(current_instruction))
+        {
+            return execute_skip_next_instruction_if_stack_value_matches_bool(true);
+        }
+        else if (std::holds_alternative<bytecode::instructions::SkipNextInstructionIfStackValueFalsy>(current_instruction))
+        {
+            return execute_skip_next_instruction_if_stack_value_matches_bool(false);
+        }
+        else if (std::holds_alternative<bytecode::instructions::GotoRelativePosition>(current_instruction))
+        {
+            int relative_pos = std::get<bytecode::instructions::GotoRelativePosition>(current_instruction).move_distance();
+            return execute_goto_relative_instruction_location(relative_pos);
+        }
         else
         {
-            return std::optional<MachineRuntimeError>("UNIMPLEMENTED INSTRUCTION");
+            return MachineRuntimeError("UNIMPLEMENTED INSTRUCTION");
         }
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_goto_relative_instruction_location(int relative_pos)
+    {
+        // @TODO give an error if the set position does not exist?
+        _instruction_memory.set_position(_instruction_memory.position() + relative_pos);
+
+        return std::optional<MachineRuntimeError>();
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_skip_next_instruction_if_stack_value_matches_bool(bool match_bool)
+    {
+        auto stack_val = _data_stack.pop();
+        if (!stack_val.has_value())
+        {
+            return MachineRuntimeError("Stack error - ran out of values");
+        }
+
+        auto try_convert_stack_val_to_bool = data_container_utils::convert_data_to_bool(*stack_val);
+        if (std::holds_alternative<data_container_utils::ConversionError>(try_convert_stack_val_to_bool))
+        {
+            auto conversion_error = std::get<data_container_utils::ConversionError>(try_convert_stack_val_to_bool);
+            return MachineRuntimeError(conversion_error.problem());
+        }
+
+        bool stack_val_to_bool = std::get<bool>(try_convert_stack_val_to_bool);
+
+        if (stack_val_to_bool == match_bool)
+        {
+            // skip the next instruction
+            _instruction_memory.set_position(_instruction_memory.position() + 2);
+        }
+        else
+        {
+            // continue to next instruction
+            _instruction_memory.set_position(_instruction_memory.position() + 1);
+        }
+
+        return std::optional<MachineRuntimeError>();
     }
 
     std::optional<MachineRuntimeError> MachineState::execute_stack_load_from_variable(const std::string & var_name)
