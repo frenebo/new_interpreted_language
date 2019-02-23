@@ -18,7 +18,7 @@ namespace virtual_machine::machine_state
     private:
         std::string _message;
     };
-    
+
     class MachineState
     {
     public:
@@ -26,7 +26,7 @@ namespace virtual_machine::machine_state
         MachineState(std::vector<bytecode::instructions::InstructionContainer> instructions);
 
         void replace_instructions(std::vector<bytecode::instructions::InstructionContainer>);
-        
+
         std::optional<MachineRuntimeError> execute_next_instruction();
         bool machine_done() const;
     private:
@@ -38,6 +38,7 @@ namespace virtual_machine::machine_state
         std::optional<MachineRuntimeError> execute_stack_add();
         std::optional<MachineRuntimeError> execute_stack_print();
         std::optional<MachineRuntimeError> execute_stack_int_push_const(int int_to_push);
+        std::optional<MachineRuntimeError> execute_stack_float_push_const(float float_to_push);
         std::optional<MachineRuntimeError> execute_stack_subtract();
         std::optional<MachineRuntimeError> execute_stack_multiply();
         std::optional<MachineRuntimeError> execute_stack_store_to_variable(const std::string & var_name);

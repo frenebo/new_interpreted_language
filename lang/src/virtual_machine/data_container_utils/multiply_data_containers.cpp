@@ -2,9 +2,8 @@
 
 namespace virtual_machine::data_container_utils
 {
-    std::variant<data_container::DataContainer, TypeError> subtract_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs)
+    std::variant<data_container::DataContainer, TypeError> multiply_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs)
     {
-
         bool lhs_is_int = std::holds_alternative<data_container::IntegerContainer>(lhs.contained());
         bool rhs_is_int = std::holds_alternative<data_container::IntegerContainer>(rhs.contained());
 
@@ -22,9 +21,9 @@ namespace virtual_machine::data_container_utils
             {
                 int lhs_val = std::get<data_container::IntegerContainer>(lhs.contained()).value();
                 int rhs_val = std::get<data_container::IntegerContainer>(rhs.contained()).value();
-                int difference = lhs_val - rhs_val;
+                int product = lhs_val * rhs_val;
 
-                return data_container::DataContainer(data_container::IntegerContainer(difference));
+                return data_container::DataContainer(data_container::IntegerContainer(product));
             }
             // float addition
             else
@@ -49,15 +48,15 @@ namespace virtual_machine::data_container_utils
                     rhs_val = std::get<data_container::IntegerContainer>(rhs.contained()).value();
                 }
 
-                float difference = lhs_val - rhs_val;
+                float product = lhs_val * rhs_val;
 
-                return data_container::DataContainer(data_container::FloatContainer(difference));
+                return data_container::DataContainer(data_container::FloatContainer(product));
             }
         }
         else
         {
             return TypeError(
-                "Incompatible subtract types: " + data_container::data_container_type_string(lhs) + " and " +
+                "Incompatible addition types: " + data_container::data_container_type_string(lhs) + " and " +
                 data_container::data_container_type_string(rhs)
             );
         }

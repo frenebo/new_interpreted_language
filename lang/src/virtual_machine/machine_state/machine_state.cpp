@@ -12,7 +12,7 @@ namespace virtual_machine::machine_state
         _data_stack = data_stack::DataStack();
         _local_variable_memory = local_variable_memory::LocalVariableMemory();
     }
-    
+
     MachineState::MachineState(std::vector<bytecode::instructions::InstructionContainer> instructions)
     : _instruction_memory(instructions)
     {
@@ -53,6 +53,11 @@ namespace virtual_machine::machine_state
         {
             int int_to_push = std::get<bytecode::instructions::StackIntegerPushConst>(current_instruction).value();
             return execute_stack_int_push_const(int_to_push);
+        }
+        else if (std::holds_alternative<bytecode::instructions::StackFloatPushConst>(current_instruction))
+        {
+            float float_to_push = std::get<bytecode::instructions::StackFloatPushConst>(current_instruction).value();
+            return execute_stack_float_push_const(float_to_push);
         }
         // stack int subtract
         else if (std::holds_alternative<bytecode::instructions::StackSubtract>(current_instruction))
@@ -111,9 +116,9 @@ namespace virtual_machine::machine_state
         }
 
         auto try_convert_stack_val_to_bool = data_container_utils::convert_data_to_bool(*stack_val);
-        if (std::holds_alternative<data_container_utils::ConversionError>(try_convert_stack_val_to_bool))
+        if (std::holds_alternative<data_container_utils::TypeError>(try_convert_stack_val_to_bool))
         {
-            auto conversion_error = std::get<data_container_utils::ConversionError>(try_convert_stack_val_to_bool);
+            auto conversion_error = std::get<data_container_utils::TypeError>(try_convert_stack_val_to_bool);
             return MachineRuntimeError(conversion_error.problem());
         }
 
@@ -143,7 +148,7 @@ namespace virtual_machine::machine_state
         }
 
         _data_stack.push(*variable_value);
-        
+
         _instruction_memory.set_position(_instruction_memory.position() + 1);
 
         return std::optional<MachineRuntimeError>();
@@ -159,28 +164,21 @@ namespace virtual_machine::machine_state
             return MachineRuntimeError("Stack error - ran out of values");
         }
 
-        auto rhs_contained = rhs_container_optional->contained();
-        auto lhs_contained = lhs_container_optional->contained();
+        auto try_multiply = data_container_utils::multiply_data_containers(*lhs_container_optional, *rhs_container_optional);
 
-        if (std::holds_alternative<data_container::IntegerContainer>(rhs_contained) &&
-            std::holds_alternative<data_container::IntegerContainer>(lhs_contained))
+        if (std::holds_alternative<data_container_utils::TypeError>(try_multiply))
         {
-            int rhs_int = std::get<data_container::IntegerContainer>(rhs_contained).value();
-            int lhs_int = std::get<data_container::IntegerContainer>(lhs_contained).value();
-            
-            auto new_int_container = data_container::IntegerContainer(rhs_int * lhs_int);
-            auto value_container = data_container::DataContainer(new_int_container);
-            
-            _data_stack.push(value_container);
-        
-            _instruction_memory.set_position(_instruction_memory.position() + 1);
-            
-            return std::optional<MachineRuntimeError>();
+            auto type_error = std::get<data_container_utils::TypeError>(try_multiply);
+            return MachineRuntimeError("Type Error: " + type_error.problem());
         }
-        else
-        {
-            return MachineRuntimeError("Incompatible or unsupported variables for multiplication");
-        }
+
+        auto value_container = std::get<data_container::DataContainer>(try_multiply);
+
+        _data_stack.push(value_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
     }
 
     std::optional<MachineRuntimeError> MachineState::execute_stack_store_to_variable(const std::string & var_name)
@@ -195,7 +193,7 @@ namespace virtual_machine::machine_state
         auto val_container = *stack_val_container_optional;
 
         _local_variable_memory.set_variable(var_name, val_container);
-        
+
         _instruction_memory.set_position(_instruction_memory.position() + 1);
 
         return std::optional<MachineRuntimeError>();
@@ -211,29 +209,21 @@ namespace virtual_machine::machine_state
             return MachineRuntimeError("Stack error - ran out of values");
         }
 
-        auto rhs_contained = rhs_container_optional->contained();
-        auto lhs_contained = lhs_container_optional->contained();
+        auto try_add = data_container_utils::add_data_containers(*lhs_container_optional, *rhs_container_optional);
+        if (std::holds_alternative<data_container_utils::TypeError>(try_add))
+        {
+            auto type_error = std::get<data_container_utils::TypeError>(try_add);
+            return MachineRuntimeError("Type Error: " + type_error.problem());
+        }
 
-        if (std::holds_alternative<data_container::IntegerContainer>(rhs_contained) &&
-            std::holds_alternative<data_container::IntegerContainer>(lhs_contained))
-        {
-            // auto instruction = std::get<bytecode::instructions::StackIntegerAdd>(current_instruction);
-            int rhs_int = std::get<data_container::IntegerContainer>(rhs_contained).value();
-            int lhs_int = std::get<data_container::IntegerContainer>(lhs_contained).value();
-            auto new_int_container = data_container::IntegerContainer(rhs_int + lhs_int);
-            auto value_container = data_container::DataContainer(new_int_container);
-            _data_stack.push(value_container);
-        
-            _instruction_memory.set_position(_instruction_memory.position() + 1);
-            
-            return std::optional<MachineRuntimeError>();
-        }
-        else
-        {
-            return MachineRuntimeError("Incompatible or unsupported variables for addition");
-        }
+        auto value_container = std::get<data_container::DataContainer>(try_add);
+        _data_stack.push(value_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
     }
-    
+
     std::optional<MachineRuntimeError> MachineState::execute_stack_print()
     {
         auto stack_val_container_optional = _data_stack.pop();
@@ -242,14 +232,14 @@ namespace virtual_machine::machine_state
         {
             return MachineRuntimeError("Stack error - ran out of values");
         }
-        
+
         auto stack_val = stack_val_container_optional->contained();
-        
+
         if (std::holds_alternative<data_container::IntegerContainer>(stack_val))
         {
             int int_val = std::get<data_container::IntegerContainer>(stack_val).value();
             std::cout << int_val << "\n";
-        
+
             _instruction_memory.set_position(_instruction_memory.position() + 1);
 
             return std::optional<MachineRuntimeError>();
@@ -260,18 +250,30 @@ namespace virtual_machine::machine_state
         }
         return std::optional<MachineRuntimeError>();
     }
-    
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_float_push_const(float float_to_push)
+    {
+        auto float_container = data_container::FloatContainer(float_to_push);
+        auto value_container = data_container::DataContainer(float_container);
+
+        _data_stack.push(value_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
+    }
+
     std::optional<MachineRuntimeError> MachineState::execute_stack_int_push_const(int int_to_push)
     {
         auto int_container = data_container::IntegerContainer(int_to_push);
         auto value_container = data_container::DataContainer(int_container);
         _data_stack.push(value_container);
-        
+
         _instruction_memory.set_position(_instruction_memory.position() + 1);
-        
+
         return std::optional<MachineRuntimeError>();
     }
-    
+
     std::optional<MachineRuntimeError> MachineState::execute_stack_subtract()
     {
         auto rhs_container_optional = _data_stack.pop();
@@ -282,29 +284,21 @@ namespace virtual_machine::machine_state
             return MachineRuntimeError("Stack error - ran out of values");
         }
 
-        auto rhs_contained = rhs_container_optional->contained();
-        auto lhs_contained = lhs_container_optional->contained();
+        auto try_subtract = data_container_utils::subtract_data_containers(*lhs_container_optional, *rhs_container_optional);
 
-        if (std::holds_alternative<data_container::IntegerContainer>(rhs_contained) &&
-            std::holds_alternative<data_container::IntegerContainer>(lhs_contained))
+        if (std::holds_alternative<data_container_utils::TypeError>(try_subtract))
         {
-            int rhs_int = std::get<data_container::IntegerContainer>(rhs_contained).value();
-            int lhs_int = std::get<data_container::IntegerContainer>(lhs_contained).value();
+            auto type_error = std::get<data_container_utils::TypeError>(try_subtract);
+            return MachineRuntimeError("Type Error: " + type_error.problem());
+        }
 
-            int new_int_val = lhs_int - rhs_int;
-            
-            auto new_int_container = data_container::IntegerContainer(new_int_val);
-            auto value_container = data_container::DataContainer(new_int_container);
-            _data_stack.push(value_container);
-        
-            _instruction_memory.set_position(_instruction_memory.position() + 1);
-            
-            return std::optional<MachineRuntimeError>();
-        }
-        else
-        {
-            return MachineRuntimeError("Incompatible or unsupported values for subtraction");
-        }
+        auto value_container = std::get<data_container::DataContainer>(try_subtract);
+
+        _data_stack.push(value_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
     }
 
     std::optional<MachineRuntimeError> MachineState::execute_stack_pop()

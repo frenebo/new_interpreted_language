@@ -2,12 +2,12 @@
 
 namespace virtual_machine::data_container_utils
 {
-    ConversionError::ConversionError(std::string problem)
+    TypeError::TypeError(std::string problem)
     : _problem(problem)
     {
     }
 
-    const std::string & ConversionError::problem() const
+    const std::string & TypeError::problem() const
     {
         return _problem;
     }

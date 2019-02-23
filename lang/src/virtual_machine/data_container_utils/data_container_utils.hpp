@@ -7,19 +7,19 @@
 
 namespace virtual_machine::data_container_utils
 {
-    class ConversionError
+    class TypeError
     {
     public:
-        ConversionError(std::string problem);
+        TypeError(std::string problem);
         const std::string & problem() const;
     private:
         std::string _problem;
     };
 
-    std::variant<bool, ConversionError> convert_data_to_bool(virtual_machine::data_container::DataContainer data_container);
-    
-    std::variant<bool, data_container::DataContainer> add_data_containers(data_container::DataContainer lhs, data_container::DataContainer rhs);
-    std::variant<bool, data_container::DataContainer> subtract_data_containers(data_container::DataContainer lhs, data_container::DataContainer rhs);
+    std::variant<bool, TypeError> convert_data_to_bool(const data_container::DataContainer & data_container);
+    std::variant<data_container::DataContainer, TypeError> add_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
+    std::variant<data_container::DataContainer, TypeError> subtract_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
+    std::variant<data_container::DataContainer, TypeError> multiply_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
 }
 
 #endif

@@ -19,7 +19,7 @@ namespace bytecode_compiler
         {
             std::vector<bytecode::instructions::InstructionContainer> statement_instructions =
                 compile_statement_container(statement);
-            
+
             instructions.insert(instructions.end(), statement_instructions.begin(), statement_instructions.end());
         }
 
@@ -59,10 +59,10 @@ namespace bytecode_compiler
     {
         auto condition_evaluate_instructions =
             instructions_to_evaluate_compound_exp_to_stack(if_statement.if_condition());
-        
+
         auto if_body_instructions =
             compile_statement_series(if_statement.body_statement_series());
-        
+
         std::vector<bytecode::instructions::InstructionContainer> instructions;
         instructions.reserve(
             condition_evaluate_instructions.size() +
@@ -105,7 +105,7 @@ namespace bytecode_compiler
         instructions.push_back(bytecode::instructions::InstructionContainer(
             bytecode::instructions::StackPop()
         ));
-        
+
         return instructions;
     }
 
@@ -133,6 +133,8 @@ namespace bytecode_compiler
             case syntax_tree::compound_expression::OperatorType::DIV_OP:
                 return 1;
         }
+        std::cout << "Unimplemented op type priority\n";
+        exit(1);
     }
 
     std::vector<bytecode::instructions::InstructionContainer>
@@ -140,7 +142,7 @@ namespace bytecode_compiler
     {
         std::vector<syntax_tree::compound_expression::PossiblyPrefixedTerminal> possibly_prefixed_terminals;
         std::vector<syntax_tree::compound_expression::OperatorType> op_types;
-        
+
         possibly_prefixed_terminals.push_back(compound_exp.start_exp());
 
         for (const syntax_tree::compound_expression::CompoundExpressionSuffix & suffix : compound_exp.suffixes())
@@ -151,7 +153,7 @@ namespace bytecode_compiler
         }
 
         std::vector<bytecode::instructions::InstructionContainer> instructions;
-        
+
         // create instructions to push first terminal to stack
         std::vector<bytecode::instructions::InstructionContainer> first_terminal_instructions =
             instructions_to_evaluate_possibly_prefixed_terminal_to_stack(possibly_prefixed_terminals[0]);
@@ -159,15 +161,15 @@ namespace bytecode_compiler
         instructions.insert(instructions.end(), first_terminal_instructions.begin(), first_terminal_instructions.end());
 
         std::vector<syntax_tree::compound_expression::OperatorType> postponed_ops;
-        
+
         for (unsigned int operator_idx = 0; operator_idx < op_types.size(); operator_idx++)
         {
             // push this terminal to stack
             std::vector<bytecode::instructions::InstructionContainer> evaluate_terminal_instructions =
                 instructions_to_evaluate_possibly_prefixed_terminal_to_stack(possibly_prefixed_terminals[operator_idx + 1]);
-            
+
             instructions.insert(instructions.end(), evaluate_terminal_instructions.begin(), evaluate_terminal_instructions.end());
-            
+
             // priority of this operator
             int this_op_priority = op_type_priority(op_types[operator_idx]);
 
@@ -199,7 +201,7 @@ namespace bytecode_compiler
                     continue;
                 }
             }
-            
+
             instructions.push_back(instruction_for_stack_operation(op_types[operator_idx]));
         }
 
@@ -214,7 +216,7 @@ namespace bytecode_compiler
 
         return instructions;
     }
-    
+
     bytecode::instructions::InstructionContainer
     BytecodeCompiler::instruction_for_stack_operation(syntax_tree::compound_expression::OperatorType op_type)
     {
@@ -291,7 +293,7 @@ namespace bytecode_compiler
         else if (std::holds_alternative<syntax_tree::terminal_expressions::NumberExpression>(contained_exp))
         {
             auto number_exp = std::get<syntax_tree::terminal_expressions::NumberExpression>(contained_exp);
-            
+
             return instruction_to_evaluate_number_expression_to_stack(number_exp);
         }
         else
@@ -324,10 +326,10 @@ namespace bytecode_compiler
         {
             std::cout << "Unimplemented number type (number terminal expression compilation)\n";
         }
-        
+
         return instructions;
     }
-    
+
     std::vector<bytecode::instructions::InstructionContainer>
     BytecodeCompiler::instruction_to_evaluate_identifier_to_stack(const syntax_tree::terminal_expressions::IdentifierExpression & identifier_expression)
     {
