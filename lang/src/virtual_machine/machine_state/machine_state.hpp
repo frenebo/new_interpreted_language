@@ -41,6 +41,7 @@ namespace virtual_machine::machine_state
         std::optional<MachineRuntimeError> execute_stack_float_push_const(float float_to_push);
         std::optional<MachineRuntimeError> execute_stack_subtract();
         std::optional<MachineRuntimeError> execute_stack_multiply();
+        std::optional<MachineRuntimeError> execute_stack_divide();
         std::optional<MachineRuntimeError> execute_stack_store_to_variable(const std::string & var_name);
         std::optional<MachineRuntimeError> execute_stack_pop();
         std::optional<MachineRuntimeError> execute_stack_load_from_variable(const std::string & var_name);

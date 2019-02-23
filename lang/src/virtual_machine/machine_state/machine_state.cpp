@@ -74,6 +74,10 @@ namespace virtual_machine::machine_state
         {
             return execute_stack_multiply();
         }
+        else if (std::holds_alternative<bytecode::instructions::StackDivide>(current_instruction))
+        {
+            return execute_stack_divide();
+        }
         else if (std::holds_alternative<bytecode::instructions::StackLoadFromVariable>(current_instruction))
         {
             std::string var_name = std::get<bytecode::instructions::StackLoadFromVariable>(current_instruction).var_name();
@@ -181,6 +185,33 @@ namespace virtual_machine::machine_state
         return std::optional<MachineRuntimeError>();
     }
 
+    std::optional<MachineRuntimeError> MachineState::execute_stack_divide()
+    {
+        auto rhs_container_optional = _data_stack.pop();
+        auto lhs_container_optional = _data_stack.pop();
+
+        if (!(rhs_container_optional.has_value() && lhs_container_optional.has_value()))
+        {
+            return MachineRuntimeError("Stack error - ran out of values");
+        }
+
+        auto try_divide = data_container_utils::divide_data_containers(*lhs_container_optional, *rhs_container_optional);
+
+        if (std::holds_alternative<data_container_utils::TypeError>(try_divide))
+        {
+            auto type_error = std::get<data_container_utils::TypeError>(try_divide);
+            return MachineRuntimeError("Type Error: " + type_error.problem());
+        }
+
+        auto value_container = std::get<data_container::DataContainer>(try_divide);
+
+        _data_stack.push(value_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
+    }
+
     std::optional<MachineRuntimeError> MachineState::execute_stack_store_to_variable(const std::string & var_name)
     {
         auto stack_val_container_optional = _data_stack.pop();
@@ -233,21 +264,19 @@ namespace virtual_machine::machine_state
             return MachineRuntimeError("Stack error - ran out of values");
         }
 
-        auto stack_val = stack_val_container_optional->contained();
-
-        if (std::holds_alternative<data_container::IntegerContainer>(stack_val))
+        auto try_convert_to_string = data_container_utils::convert_data_to_string(*stack_val_container_optional);
+        if (std::holds_alternative<data_container_utils::TypeError>(try_convert_to_string))
         {
-            int int_val = std::get<data_container::IntegerContainer>(stack_val).value();
-            std::cout << int_val << "\n";
-
-            _instruction_memory.set_position(_instruction_memory.position() + 1);
-
-            return std::optional<MachineRuntimeError>();
+            auto type_error = std::get<data_container_utils::TypeError>(try_convert_to_string);
+            return MachineRuntimeError("Type Error: " + type_error.problem());
         }
-        else
-        {
-            return MachineRuntimeError("Unsupported type for prints");
-        }
+
+        std::string converted_to_string = std::get<std::string>(try_convert_to_string);
+
+        std::cout << converted_to_string << "\n";
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
         return std::optional<MachineRuntimeError>();
     }
 

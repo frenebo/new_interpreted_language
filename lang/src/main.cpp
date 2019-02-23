@@ -54,7 +54,12 @@ int main(int argc, char *argv[])
 	auto instructions = bytecode_compiler::BytecodeCompiler().compile_statement_series(statement_series);
 	bytecode_printer::print_instructions(instructions);
 
-	virtual_machine::runner::run_bytecode(instructions);
+	auto runtime_error_possible = virtual_machine::runner::run_bytecode(instructions);
+    if (runtime_error_possible.has_value())
+    {
+        std::cout << "Runtime Error: " << runtime_error_possible->message() << "\n";
+        return 1;
+    }
 
 	return 0;
 }

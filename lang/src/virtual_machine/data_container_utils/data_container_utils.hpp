@@ -20,6 +20,9 @@ namespace virtual_machine::data_container_utils
     std::variant<data_container::DataContainer, TypeError> add_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
     std::variant<data_container::DataContainer, TypeError> subtract_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
     std::variant<data_container::DataContainer, TypeError> multiply_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
+    std::variant<data_container::DataContainer, TypeError> divide_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
+
+    std::variant<std::string, TypeError> convert_data_to_string(const data_container::DataContainer & data_container);
 }
 
 #endif
