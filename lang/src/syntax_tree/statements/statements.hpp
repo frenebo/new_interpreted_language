@@ -75,7 +75,7 @@ namespace syntax_tree::statements
 
         ~ForLoopStatement();
         ForLoopStatement(const ForLoopStatement &);
-        ForLoopStatement & operator=(const ForLoopStatement rhs);
+        ForLoopStatement & operator=(const ForLoopStatement & rhs);
     private:
         syntax_tree::compound_expression::CompoundExpression _setup_expression;
         syntax_tree::compound_expression::CompoundExpression _condition_expression;

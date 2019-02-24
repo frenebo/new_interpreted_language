@@ -31,4 +31,13 @@ namespace syntax_tree::statements
     _body_statement_series(std::make_unique<syntax_tree::statement_series::StatementSeries>(rhs.body_statement_series()))
     {
     }
+    
+    IfStatement & IfStatement::operator=(const IfStatement & rhs)
+    {
+        _if_condition = rhs.if_condition();
+        _body_statement_series.reset(nullptr);
+        _body_statement_series = std::make_unique<syntax_tree::statement_series::StatementSeries>(rhs.body_statement_series());
+
+        return *this;
+    }
 }

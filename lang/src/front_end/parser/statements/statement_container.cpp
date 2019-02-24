@@ -43,6 +43,24 @@ namespace parser::statements
             }
         }
 
+        if (next_tok_type == tokens::TokenType::FOR_KEYWORD)
+        {
+            auto try_parse_for_loop_statement = parse_for_loop_statement(tokens, start_idx);
+            if (std::holds_alternative<ParseResult<syntax_tree::statements::ForLoopStatement>>(try_parse_for_loop_statement))
+            {
+                auto for_loop_statement_result =
+                    std::get<ParseResult<syntax_tree::statements::ForLoopStatement>>(try_parse_for_loop_statement);
+                
+                auto statement_container = syntax_tree::statements::StatementContainer(for_loop_statement_result.contained());
+
+                return ParseResult<syntax_tree::statements::StatementContainer>(statement_container, for_loop_statement_result.consumed_count());
+            }
+            else
+            {
+                return std::get<ParseError>(try_parse_for_loop_statement);
+            }
+        }
+
         if (next_tok_type == tokens::TokenType::IDENTIFIER &&
             tokens[start_idx + 1].token_type() == tokens::TokenType::EQUALS_SIGN)
         {

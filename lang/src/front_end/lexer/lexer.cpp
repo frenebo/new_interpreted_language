@@ -20,6 +20,7 @@ namespace lexer
             { "}", tokens::TokenType::CLOSE_BRACE },
             { "print", tokens::TokenType::PRINT_KEYWORD },
             { "if", tokens::TokenType::IF_KEYWORD },
+            { "for", tokens::TokenType::FOR_KEYWORD },
         };
     }
     

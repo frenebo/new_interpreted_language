@@ -21,6 +21,7 @@ namespace tokens
         IDENTIFIER,
         PRINT_KEYWORD,
         IF_KEYWORD,
+        FOR_KEYWORD,
         WHITESPACE,
         END_OF_INPUT,
     };

@@ -38,6 +38,8 @@ namespace tokens
             return "print keyword";
         case IF_KEYWORD:
             return "if keyword";
+        case FOR_KEYWORD:
+            return "for keyword";
         case END_OF_INPUT:
             return "end of input";
         default:
