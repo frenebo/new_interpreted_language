@@ -61,25 +61,6 @@ namespace parser::statements
             }
         }
 
-        if (next_tok_type == tokens::TokenType::IDENTIFIER &&
-            tokens[start_idx + 1].token_type() == tokens::TokenType::EQUALS_SIGN)
-        {
-            auto try_parse_assignment_statement = parse_assignment_statement(tokens, start_idx);
-
-            if (std::holds_alternative<ParseResult<syntax_tree::statements::AssignmentStatement>>(try_parse_assignment_statement))
-            {
-                auto parsed_assignment_statement = std::get<ParseResult<syntax_tree::statements::AssignmentStatement>>(try_parse_assignment_statement);
-
-                auto statement_container = syntax_tree::statements::StatementContainer(parsed_assignment_statement.contained());
-
-                return ParseResult<syntax_tree::statements::StatementContainer>(statement_container, parsed_assignment_statement.consumed_count());
-            }
-            else
-            {
-                return std::get<ParseError>(try_parse_assignment_statement);
-            }
-        }
-
         auto try_parse_compound_statement = parse_compound_expression_statement(tokens, start_idx);
         if (std::holds_alternative<ParseResult<syntax_tree::statements::CompoundExpressionStatement>>(try_parse_compound_statement))
         {

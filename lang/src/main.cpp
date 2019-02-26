@@ -51,8 +51,18 @@ int main(int argc, char *argv[])
 	auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(try_parse);
 	syntax_tree_printer::statement_series::print_statement_series(statement_series, 0);
 
-	auto instructions = bytecode_compiler::BytecodeCompiler().compile_statement_series(statement_series);
-	bytecode_printer::print_instructions(instructions);
+	auto try_compile_instructions = bytecode_compiler::BytecodeCompiler().compile_statement_series(statement_series);
+    if (std::holds_alternative<bytecode_compiler::BytecodeCompilerError>(try_compile_instructions))
+    {
+        bytecode_compiler::BytecodeCompilerError compiler_err = std::get<bytecode_compiler::BytecodeCompilerError>(try_compile_instructions);
+        std::cout << "Compiler Error: " << compiler_err.message() << "\n";
+        return 1;
+    }
+
+    std::vector<bytecode::instructions::InstructionContainer> instructions =
+        std::get<std::vector<bytecode::instructions::InstructionContainer>>(try_compile_instructions);
+	
+    bytecode_printer::print_instructions(instructions);
 
 	auto runtime_error_possible = virtual_machine::runner::run_bytecode(instructions);
     if (runtime_error_possible.has_value())

@@ -25,6 +25,10 @@ namespace parser::compound_expression
         {
             op_type = syntax_tree::compound_expression::OperatorType::DIV_OP;
         }
+        else if (next_token_type == tokens::TokenType::EQUALS_SIGN)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP;
+        }
         else
         {
             return ParseError("Unexpected token " + tokens::tok_type_to_str(next_token_type));

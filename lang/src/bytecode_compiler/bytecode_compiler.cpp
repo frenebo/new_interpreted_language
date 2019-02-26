@@ -6,28 +6,17 @@
 
 namespace bytecode_compiler
 {
+    void BytecodeCompiler::push_instructions(InstructionsVec & target_vec, const InstructionsVec & source_vec)
+    {
+        target_vec.insert(target_vec.end(), source_vec.begin(), source_vec.end());
+    }
+    
     BytecodeCompiler::BytecodeCompiler()
     {
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::compile_statement_series(const syntax_tree::statement_series::StatementSeries & statement_series)
-    {
-        std::vector<bytecode::instructions::InstructionContainer> instructions;
 
-        for (const syntax_tree::statements::StatementContainer & statement : statement_series.statements())
-        {
-            std::vector<bytecode::instructions::InstructionContainer> statement_instructions =
-                compile_statement_container(statement);
-
-            instructions.insert(instructions.end(), statement_instructions.begin(), statement_instructions.end());
-        }
-
-        return instructions;
-    }
-
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::compile_statement_container(const syntax_tree::statements::StatementContainer & statement_container)
+    BytecodeCompiler::BytecodeCompiler::InstructionsOrErr BytecodeCompiler::compile_statement_container(const syntax_tree::statements::StatementContainer & statement_container)
     {
         auto contained_statement = statement_container.contained_statement();
 
@@ -39,29 +28,33 @@ namespace bytecode_compiler
         {
             return compile_print_statement(std::get<syntax_tree::statements::PrintStatement>(contained_statement));
         }
-        else if (std::holds_alternative<syntax_tree::statements::AssignmentStatement>(contained_statement))
-        {
-            return compile_assignment_statement(std::get<syntax_tree::statements::AssignmentStatement>(contained_statement));
-        }
         else if (std::holds_alternative<syntax_tree::statements::IfStatement>(contained_statement))
         {
             return compile_if_statement(std::get<syntax_tree::statements::IfStatement>(contained_statement));
         }
         else
         {
-            std::cout << "Unimplemented statement compile\n";
-            exit(1);
+            return BytecodeCompilerError("Unimplemented statement compile\n");
         }
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::compile_if_statement(const syntax_tree::statements::IfStatement & if_statement)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::compile_if_statement(const syntax_tree::statements::IfStatement & if_statement)
     {
-        auto condition_evaluate_instructions =
+        auto try_compile_condition_evaluate_instructions =
             instructions_to_evaluate_compound_exp_to_stack(if_statement.if_condition());
+        if (std::holds_alternative<BytecodeCompilerError>(try_compile_condition_evaluate_instructions))
+        {
+            return std::get<BytecodeCompilerError>(try_compile_condition_evaluate_instructions);
+        }
+        auto condition_evaluate_instructions = std::get<InstructionsVec>(try_compile_condition_evaluate_instructions);
 
-        auto if_body_instructions =
+        auto try_compile_if_body_instructions =
             compile_statement_series(if_statement.body_statement_series());
+        if (std::holds_alternative<BytecodeCompilerError>(try_compile_if_body_instructions))
+        {
+            return std::get<BytecodeCompilerError>(try_compile_if_body_instructions);
+        }
+        auto if_body_instructions = std::get<InstructionsVec>(try_compile_if_body_instructions);
 
         std::vector<bytecode::instructions::InstructionContainer> instructions;
         instructions.reserve(
@@ -84,22 +77,15 @@ namespace bytecode_compiler
         return instructions;
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::compile_assignment_statement(const syntax_tree::statements::AssignmentStatement & assignment_statement)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::compile_compound_expression_statement(const syntax_tree::statements::CompoundExpressionStatement & compound_expression_statement)
     {
-        auto instructions = instructions_to_evaluate_compound_exp_to_stack(assignment_statement.assigned_exp());
+        auto try_compile_exp_instructions = instructions_to_evaluate_compound_exp_to_stack(compound_expression_statement.compound_exp());
+        if (std::holds_alternative<BytecodeCompilerError>(try_compile_exp_instructions))
+        {
+            return std::get<BytecodeCompilerError>(try_compile_exp_instructions);
+        }
 
-        instructions.push_back(bytecode::instructions::InstructionContainer(
-            bytecode::instructions::StackStoreToVariable(assignment_statement.var_name())
-        ));
-
-        return instructions;
-    }
-
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::compile_compound_expression_statement(const syntax_tree::statements::CompoundExpressionStatement & compound_expression_statement)
-    {
-        auto instructions = instructions_to_evaluate_compound_exp_to_stack(compound_expression_statement.compound_exp());
+        auto instructions = std::get<InstructionsVec>(try_compile_exp_instructions);
 
         // get rid of the resulting value
         instructions.push_back(bytecode::instructions::InstructionContainer(
@@ -109,10 +95,16 @@ namespace bytecode_compiler
         return instructions;
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::compile_print_statement(const syntax_tree::statements::PrintStatement & print_statement)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::compile_print_statement(const syntax_tree::statements::PrintStatement & print_statement)
     {
-        auto instructions = instructions_to_evaluate_compound_exp_to_stack(print_statement.exp_to_print());
+        auto try_parse_instructions = instructions_to_evaluate_compound_exp_to_stack(print_statement.exp_to_print());
+
+        if (std::holds_alternative<BytecodeCompilerError>(try_parse_instructions))
+        {
+            return std::get<BytecodeCompilerError>(try_parse_instructions);
+        }
+
+        auto instructions = std::get<InstructionsVec>(try_parse_instructions);
 
         // print the resulting value
         instructions.push_back(bytecode::instructions::InstructionContainer(
@@ -122,23 +114,23 @@ namespace bytecode_compiler
         return instructions;
     }
 
-    int op_type_priority(syntax_tree::compound_expression::OperatorType op_type)
+    std::variant<int, BytecodeCompilerError> op_type_priority(syntax_tree::compound_expression::OperatorType op_type)
     {
         switch (op_type)
         {
+            case syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP:
+                return 0;
             case syntax_tree::compound_expression::OperatorType::MINUS_OP:
             case syntax_tree::compound_expression::OperatorType::PLUS_OP:
-                return 0;
+                return 1;
             case syntax_tree::compound_expression::OperatorType::MULT_OP:
             case syntax_tree::compound_expression::OperatorType::DIV_OP:
-                return 1;
+                return 2;
         }
-        std::cout << "Unimplemented op type priority\n";
-        exit(1);
+        return BytecodeCompilerError("Unimplemented op type priority\n");
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::instructions_to_evaluate_compound_exp_to_stack(const syntax_tree::compound_expression::CompoundExpression & compound_exp)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::instructions_to_evaluate_compound_exp_to_stack(const syntax_tree::compound_expression::CompoundExpression & compound_exp)
     {
         std::vector<syntax_tree::compound_expression::PossiblyPrefixedTerminal> possibly_prefixed_terminals;
         std::vector<syntax_tree::compound_expression::OperatorType> op_types;
@@ -154,9 +146,27 @@ namespace bytecode_compiler
 
         std::vector<bytecode::instructions::InstructionContainer> instructions;
 
+        std::vector<int> op_type_priorities;
+        for (syntax_tree::compound_expression::OperatorType op_type : op_types)
+        {
+            auto try_get_op_type = op_type_priority(op_type);
+            if (std::holds_alternative<BytecodeCompilerError>(try_get_op_type))
+            {
+                return std::get<BytecodeCompilerError>(try_get_op_type);
+            }
+            int op_type_priority = std::get<int>(try_get_op_type);
+            op_type_priorities.push_back(op_type_priority);
+        }
+
         // create instructions to push first terminal to stack
-        std::vector<bytecode::instructions::InstructionContainer> first_terminal_instructions =
+        auto try_parse_first_terminal_instructions =
             instructions_to_evaluate_possibly_prefixed_terminal_to_stack(possibly_prefixed_terminals[0]);
+        if (std::holds_alternative<BytecodeCompilerError>(try_parse_first_terminal_instructions))
+        {
+            return std::get<BytecodeCompilerError>(try_parse_first_terminal_instructions);
+        }
+        InstructionsVec first_terminal_instructions = std::get<InstructionsVec>(try_parse_first_terminal_instructions);
+        
         // insert instructions to push first terminal to stack
         instructions.insert(instructions.end(), first_terminal_instructions.begin(), first_terminal_instructions.end());
 
@@ -164,14 +174,20 @@ namespace bytecode_compiler
 
         for (unsigned int operator_idx = 0; operator_idx < op_types.size(); operator_idx++)
         {
-            // push this terminal to stack
-            std::vector<bytecode::instructions::InstructionContainer> evaluate_terminal_instructions =
+            // push the terminal to the stack
+            InstructionsOrErr try_compile_terminal =
                 instructions_to_evaluate_possibly_prefixed_terminal_to_stack(possibly_prefixed_terminals[operator_idx + 1]);
+            
+            if (std::holds_alternative<BytecodeCompilerError>(try_compile_terminal))
+            {
+                return std::get<BytecodeCompilerError>(try_compile_terminal);
+            }
+            InstructionsVec evaluate_terminal_instructions = std::get<InstructionsVec>(try_compile_terminal);
 
-            instructions.insert(instructions.end(), evaluate_terminal_instructions.begin(), evaluate_terminal_instructions.end());
+            push_instructions(instructions, evaluate_terminal_instructions);
 
             // priority of this operator
-            int this_op_priority = op_type_priority(op_types[operator_idx]);
+            int this_op_priority = op_type_priorities[operator_idx];
 
             if (postponed_ops.size() != 0)
             {
@@ -183,9 +199,14 @@ namespace bytecode_compiler
                 {
                     while (postponed_ops.size() != 0)
                     {
-                        instructions.push_back(
-                            instruction_for_stack_operation(postponed_ops.back())
-                        );
+                        InstructionsOrErr try_compile_instructions_for_op = instructions_for_stack_operation(postponed_ops.back());
+                        if (std::holds_alternative<BytecodeCompilerError>(try_compile_instructions_for_op))
+                        {
+                            return std::get<BytecodeCompilerError>(try_compile_instructions_for_op);
+                        }
+                        InstructionsVec instructions_for_op = std::get<InstructionsVec>(try_compile_instructions_for_op);
+
+                        push_instructions(instructions, instructions_for_op);
                         postponed_ops.pop_back();
                     }
                 }
@@ -193,7 +214,7 @@ namespace bytecode_compiler
 
             if (operator_idx != op_types.size() - 1)
             {
-                int next_op_priority = op_type_priority(op_types[operator_idx + 1]);
+                int next_op_priority = op_type_priorities[operator_idx + 1];
 
                 if (this_op_priority < next_op_priority)
                 {
@@ -202,60 +223,80 @@ namespace bytecode_compiler
                 }
             }
 
-            instructions.push_back(instruction_for_stack_operation(op_types[operator_idx]));
+            InstructionsOrErr try_compile_instructions_for_op = instructions_for_stack_operation(op_types[operator_idx]);
+            if (std::holds_alternative<BytecodeCompilerError>(try_compile_instructions_for_op))
+            {
+                return std::get<BytecodeCompilerError>(try_compile_instructions_for_op);
+            }
+            InstructionsVec instructions_for_op = std::get<InstructionsVec>(try_compile_instructions_for_op);
+            push_instructions(instructions, instructions_for_op);
         }
 
         // add instructions for postponed ops while these exist
         while (postponed_ops.size() != 0)
         {
-            instructions.push_back(
-                instruction_for_stack_operation(postponed_ops.back())
-            );
+            auto try_compile_instructions_for_op = instructions_for_stack_operation(postponed_ops.back());
+            if (std::holds_alternative<BytecodeCompilerError>(try_compile_instructions_for_op))
+            {
+                return std::get<BytecodeCompilerError>(try_compile_instructions_for_op);
+            }
+            InstructionsVec instructions_for_op = std::get<InstructionsVec>(try_compile_instructions_for_op);
+            
+            push_instructions(instructions, instructions_for_op);
+            
             postponed_ops.pop_back();
         }
 
         return instructions;
     }
 
-    bytecode::instructions::InstructionContainer
-    BytecodeCompiler::instruction_for_stack_operation(syntax_tree::compound_expression::OperatorType op_type)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::instructions_for_stack_operation(syntax_tree::compound_expression::OperatorType op_type)
     {
+        std::vector<bytecode::instructions::InstructionContainer> instructions;
         if (op_type == syntax_tree::compound_expression::OperatorType::DIV_OP)
         {
-            return bytecode::instructions::InstructionContainer(
+            instructions.push_back(bytecode::instructions::InstructionContainer(
                 bytecode::instructions::StackDivide()
-            );
+            ));
         }
         else if (op_type == syntax_tree::compound_expression::OperatorType::MINUS_OP)
         {
-            return bytecode::instructions::InstructionContainer(
+            instructions.push_back(bytecode::instructions::InstructionContainer(
                 bytecode::instructions::StackSubtract()
-            );
+            ));
         }
         else if (op_type == syntax_tree::compound_expression::OperatorType::MULT_OP)
         {
-            return bytecode::instructions::InstructionContainer(
+            instructions.push_back(bytecode::instructions::InstructionContainer(
                 bytecode::instructions::StackMultiply()
-            );
+            ));
         }
         else if (op_type == syntax_tree::compound_expression::OperatorType::PLUS_OP)
         {
-            return bytecode::instructions::InstructionContainer(
+            instructions.push_back(bytecode::instructions::InstructionContainer(
                 bytecode::instructions::StackAdd()
-            );
+            ));
+        }
+        else if (op_type == syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP)
+        {
+            return BytecodeCompilerError("Compiler: Unimplemented assignment operation\n");
         }
         else
         {
-            std::cout << "Unimplemented operation type\n";
-            // placeholder
-            exit(1);
+            return BytecodeCompilerError("Compiler: Unimplemented operation type\n");
         }
+
+        return instructions;
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::instructions_to_evaluate_possibly_prefixed_terminal_to_stack(const syntax_tree::compound_expression::PossiblyPrefixedTerminal & possibly_prefixed_terminal_expression)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::instructions_to_evaluate_possibly_prefixed_terminal_to_stack(const syntax_tree::compound_expression::PossiblyPrefixedTerminal & possibly_prefixed_terminal_expression)
     {
-        auto instructions = instructions_to_evaluate_terminal_to_stack(possibly_prefixed_terminal_expression.terminal_exp_container());
+        InstructionsOrErr try_compile_terminal_instructions = instructions_to_evaluate_terminal_to_stack(possibly_prefixed_terminal_expression.terminal_exp_container());
+        if (std::holds_alternative<BytecodeCompilerError>(try_compile_terminal_instructions))
+        {
+            return std::get<BytecodeCompilerError>(try_compile_terminal_instructions);
+        }
+        InstructionsVec instructions = std::get<InstructionsVec>(try_compile_terminal_instructions);
 
         auto possible_prefix_type = possibly_prefixed_terminal_expression.possible_prefix_type();
         if (possible_prefix_type.has_value())
@@ -273,15 +314,14 @@ namespace bytecode_compiler
             }
             else
             {
-                std::cout << "Compiler: unimplemented terminal value prefix\n";
+                return BytecodeCompilerError("Compiler: unimplemented terminal value prefix\n");
             }
         }
 
         return instructions;
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::instructions_to_evaluate_terminal_to_stack(const syntax_tree::terminal_expressions::TerminalExpressionContainer & terminal_expression)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::instructions_to_evaluate_terminal_to_stack(const syntax_tree::terminal_expressions::TerminalExpressionContainer & terminal_expression)
     {
         auto contained_exp = terminal_expression.contained_terminal_exp();
         if (std::holds_alternative<syntax_tree::terminal_expressions::IdentifierExpression>(contained_exp))
@@ -298,13 +338,11 @@ namespace bytecode_compiler
         }
         else
         {
-            std::cout << "Unimplemented terminal expression\n";
-            return std::vector<bytecode::instructions::InstructionContainer>();
+            return BytecodeCompilerError("Compiler: Unimplemented terminal expression\n");
         }
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::instruction_to_evaluate_number_expression_to_stack(const syntax_tree::terminal_expressions::NumberExpression & number_expression)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::instruction_to_evaluate_number_expression_to_stack(const syntax_tree::terminal_expressions::NumberExpression & number_expression)
     {
         std::vector<bytecode::instructions::InstructionContainer> instructions;
 
@@ -324,14 +362,13 @@ namespace bytecode_compiler
         }
         else
         {
-            std::cout << "Unimplemented number type (number terminal expression compilation)\n";
+            return BytecodeCompilerError("Unimplemented number type (number terminal expression compilation)\n");
         }
 
         return instructions;
     }
 
-    std::vector<bytecode::instructions::InstructionContainer>
-    BytecodeCompiler::instruction_to_evaluate_identifier_to_stack(const syntax_tree::terminal_expressions::IdentifierExpression & identifier_expression)
+    BytecodeCompiler::InstructionsOrErr BytecodeCompiler::instruction_to_evaluate_identifier_to_stack(const syntax_tree::terminal_expressions::IdentifierExpression & identifier_expression)
     {
         std::vector<bytecode::instructions::InstructionContainer> instructions;
 

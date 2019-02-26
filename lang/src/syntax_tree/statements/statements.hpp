@@ -22,17 +22,6 @@ namespace syntax_tree::statements
         syntax_tree::compound_expression::CompoundExpression _exp_to_print;
     };
 
-    class AssignmentStatement
-    {
-    public:
-        AssignmentStatement(std::string var_name, syntax_tree::compound_expression::CompoundExpression assigned_exp);
-        const std::string & var_name() const;
-        const syntax_tree::compound_expression::CompoundExpression & assigned_exp() const;
-    private:
-        std::string _var_name;
-        syntax_tree::compound_expression::CompoundExpression _assigned_exp;
-    };
-
     class CompoundExpressionStatement
     {
     public:
@@ -91,8 +80,7 @@ namespace syntax_tree::statements
             CompoundExpressionStatement,
             PrintStatement,
             IfStatement,
-            ForLoopStatement,
-            AssignmentStatement
+            ForLoopStatement
         > VariantContainedStatement;
 
         StatementContainer(VariantContainedStatement contained_statement);
