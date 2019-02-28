@@ -19,6 +19,9 @@ namespace parser::terminal_expressions
 
     std::variant<ParseResult<syntax_tree::terminal_expressions::NumberExpression>, ParseError>
     parse_number_expression(const std::vector<tokens::Token> & tokens, unsigned long start_idx);
+
+    std::variant<ParseResult<syntax_tree::terminal_expressions::BoolLiteralExpression>, ParseError>
+    parse_bool_literal_expression(const std::vector<tokens::Token> & tokens, unsigned long start_idx);
 }
 
 #endif

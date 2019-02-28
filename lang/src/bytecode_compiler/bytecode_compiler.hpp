@@ -37,8 +37,8 @@ namespace bytecode_compiler
         InstructionsOrErr compile_if_statement(const syntax_tree::statements::IfStatement & if_statement);
         InstructionsOrErr compile_for_statement(const syntax_tree::statements::ForLoopStatement & if_statement);
         InstructionsOrErr compile_compound_exp_evaluation(const syntax_tree::compound_expression::CompoundExpression & compound_exp);
-        InstructionsOrErr compile_possibly_prefixed_terminal_evaluation(const syntax_tree::compound_expression::PossiblyPrefixedTerminal & possibly_prefixed_terminal_expression);
-        InstructionsOrErr compile_terminal_evaluation(const syntax_tree::terminal_expressions::TerminalExpressionContainer & terminal_expression);
+        // InstructionsOrErr compile_possibly_prefixed_terminal_evaluation(const syntax_tree::compound_expression::PossiblyPrefixedTerminal & possibly_prefixed_terminal_expression);
+        // InstructionsOrErr compile_terminal_evaluation(const syntax_tree::terminal_expressions::TerminalExpressionContainer & terminal_expression);
 
     };
 }

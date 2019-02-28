@@ -16,7 +16,17 @@ namespace bytecode::instructions
     class StackCompareLessThanOrEqualTo {};
     class StackApplyNot {};
     
-    class StackIntegerPushConst {
+    class StackBoolPushConst
+    {
+    public:
+        StackBoolPushConst(bool value);
+        bool value() const;
+    private:
+        bool _value;
+    };
+    
+    class StackIntegerPushConst
+    {
     public:
         StackIntegerPushConst(int value);
         int value() const;
@@ -24,7 +34,8 @@ namespace bytecode::instructions
         int _value;
     };
 
-    class StackFloatPushConst {
+    class StackFloatPushConst
+    {
     public:
         StackFloatPushConst(float value);
         float value() const;
@@ -34,7 +45,8 @@ namespace bytecode::instructions
 
     class StackPrint {};
 
-    class StackStoreToVariable {
+    class StackStoreToVariable
+    {
     public:
         StackStoreToVariable(const std::string & var_name);
         const std::string & var_name() const;
@@ -42,7 +54,8 @@ namespace bytecode::instructions
         std::string _var_name;
     };
 
-    class StackLoadFromVariable {
+    class StackLoadFromVariable
+    {
     public:
         StackLoadFromVariable(const std::string & var_name);
         const std::string & var_name() const;
@@ -56,7 +69,8 @@ namespace bytecode::instructions
     class SkipNextInstructionIfStackValueTruthy {};
     class SkipNextInstructionIfStackValueFalsy {};
 
-    class GotoRelativePosition {
+    class GotoRelativePosition
+    {
     public:
         // move_distance can be negative to move backwards, positive to move forwards.
         GotoRelativePosition(int move_distance);
@@ -78,6 +92,7 @@ namespace bytecode::instructions
             StackApplyNot,
             StackIntegerPushConst,
             StackFloatPushConst,
+            StackBoolPushConst,
             StackPrint,
             StackStoreToVariable,
             StackLoadFromVariable,

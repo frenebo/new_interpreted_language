@@ -24,6 +24,8 @@ namespace tokens
         PRINT_KEYWORD,
         IF_KEYWORD,
         FOR_KEYWORD,
+        TRUE_KEYWORD,
+        FALSE_KEYWORD,
         WHITESPACE,
         LESS_THAN_OP,
         LESS_THAN_OR_EQUAL_OP,

@@ -129,10 +129,27 @@ namespace virtual_machine::machine_state
         {
             return execute_stack_apply_not();
         }
+        else if (std::holds_alternative<bytecode::instructions::StackBoolPushConst>(current_instruction))
+        {
+            bool push_val = std::get<bytecode::instructions::StackBoolPushConst>(current_instruction).value();
+
+            return execute_stack_bool_push_const(push_val);
+        }
         else
         {
             return MachineRuntimeError("UNIMPLEMENTED INSTRUCTION");
         }
+    }
+    
+    std::optional<MachineRuntimeError> MachineState::execute_stack_bool_push_const(bool bool_to_push)
+    {
+        auto push_data_container = data_container::DataContainer(data_container::BoolContainer(bool_to_push));
+
+        _data_stack.push(push_data_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
     }
 
     std::optional<MachineRuntimeError> MachineState::execute_stack_compare_less_than()

@@ -14,6 +14,10 @@ namespace syntax_tree_printer::terminal_expressions
         {
             print_number_expression(std::get<syntax_tree::terminal_expressions::NumberExpression>(contained), indents);
         }
+        else if (std::holds_alternative<syntax_tree::terminal_expressions::BoolLiteralExpression>(contained))
+        {
+            print_bool_literal_expression(std::get<syntax_tree::terminal_expressions::BoolLiteralExpression>(contained), indents);
+        }
         else
         {
             std::cout << std::string(indents, ' ') << "Unimplemented terminal print\n";

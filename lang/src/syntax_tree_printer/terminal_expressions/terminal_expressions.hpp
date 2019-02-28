@@ -10,6 +10,8 @@ namespace syntax_tree_printer::terminal_expressions
     void print_identifier_expression(const syntax_tree::terminal_expressions::IdentifierExpression & identifier_exp, unsigned int indents);
 
     void print_number_expression(const syntax_tree::terminal_expressions::NumberExpression & number_exp, unsigned int indents);
+
+    void print_bool_literal_expression(const syntax_tree::terminal_expressions::BoolLiteralExpression & bool_literal_exp, unsigned int indents);
 }
 
 #endif

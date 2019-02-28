@@ -82,6 +82,19 @@ namespace bytecode_compiler
                 return BytecodeCompilerError("Unimplemented terminal expression compile type");
             }
         }
+        else if (std::holds_alternative<syntax_tree::terminal_expressions::BoolLiteralExpression>(contained))
+        {
+            auto bool_exp = std::get<syntax_tree::terminal_expressions::BoolLiteralExpression>(contained);
+            BytecodeCompiler::InstructionsVec instructions;
+
+            instructions.push_back(bytecode::instructions::InstructionContainer(
+                bytecode::instructions::StackBoolPushConst(bool_exp.value())
+            ));
+
+            return compound_exp_tree::CompoundExpNodeContainer(
+                compound_exp_tree::CompoundExpValueNode(instructions)
+            );
+        }
         else
         {
             return BytecodeCompilerError("Unimplemented terminal node compilation");

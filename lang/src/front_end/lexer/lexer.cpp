@@ -28,6 +28,8 @@ namespace lexer
             { "print", tokens::TokenType::PRINT_KEYWORD },
             { "if",    tokens::TokenType::IF_KEYWORD },
             { "for",   tokens::TokenType::FOR_KEYWORD },
+            { "true", tokens::TokenType::TRUE_KEYWORD },
+            { "false", tokens::TokenType::FALSE_KEYWORD },
         };
     }
     
