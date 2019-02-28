@@ -23,6 +23,11 @@ namespace tokens
         IF_KEYWORD,
         FOR_KEYWORD,
         WHITESPACE,
+        LESS_THAN_OP,
+        LESS_THAN_OR_EQUAL_OP,
+        MORE_THAN_OP,
+        MORE_THAN_OR_EQUAL_OP,
+        DOUBLE_EQUALS,
         END_OF_INPUT,
     };
 

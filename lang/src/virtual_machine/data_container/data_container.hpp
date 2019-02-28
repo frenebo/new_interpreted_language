@@ -23,11 +23,25 @@ namespace virtual_machine::data_container
     private:
         float _value;
     };
+
+    class BoolContainer
+    {
+    public:
+        BoolContainer(bool value);
+        bool value() const;
+    private:
+        bool _value;
+    };
     
     class DataContainer
     {
     public:
-        typedef std::variant<IntegerContainer, FloatContainer> VariantDataContainer;
+        typedef std::variant<
+            IntegerContainer,
+            FloatContainer,
+            BoolContainer
+        > VariantDataContainer;
+        
         DataContainer(VariantDataContainer contained);
 
         const VariantDataContainer & contained() const;

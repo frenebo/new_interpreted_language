@@ -42,6 +42,16 @@ namespace tokens
             return "for keyword";
         case END_OF_INPUT:
             return "end of input";
+        case LESS_THAN_OP:
+            return "< operator";
+        case LESS_THAN_OR_EQUAL_OP:
+            return "<= operator";
+        case MORE_THAN_OP:
+            return "> operator";
+        case MORE_THAN_OR_EQUAL_OP:
+            return ">= operator";
+        case DOUBLE_EQUALS:
+            return "== operator";
         default:
             return "unimplemented token string";
         }

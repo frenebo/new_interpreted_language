@@ -29,6 +29,26 @@ namespace parser::compound_expression
         {
             op_type = syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP;
         }
+        else if (next_token_type == tokens::TokenType::LESS_THAN_OP)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::LESS_THAN_OP;
+        }
+        else if (next_token_type == tokens::TokenType::LESS_THAN_OR_EQUAL_OP)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::LESS_THAN_OR_EQUAL_OP;
+        }
+        else if (next_token_type == tokens::TokenType::MORE_THAN_OP)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::MORE_THAN_OP;
+        }
+        else if (next_token_type == tokens::TokenType::MORE_THAN_OR_EQUAL_OP)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::MORE_THAN_OR_EQUAL_OP;
+        }
+        else if (next_token_type == tokens::TokenType::DOUBLE_EQUALS)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP;
+        }
         else
         {
             return ParseError("Unexpected token " + tokens::tok_type_to_str(next_token_type));

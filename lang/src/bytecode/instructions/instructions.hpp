@@ -11,6 +11,10 @@ namespace bytecode::instructions
     class StackSubtract {};
     class StackMultiply {};
     class StackDivide {};
+
+    class StackCompareLessThan {};
+    class StackCompareLessThanOrEqualTo {};
+    class StackApplyNot {};
     
     class StackIntegerPushConst {
     public:
@@ -69,6 +73,9 @@ namespace bytecode::instructions
             StackSubtract,
             StackMultiply,
             StackDivide,
+            StackCompareLessThan,
+            StackCompareLessThanOrEqualTo,
+            StackApplyNot,
             StackIntegerPushConst,
             StackFloatPushConst,
             StackPrint,

@@ -8,19 +8,24 @@ namespace lexer
     Lexer::Lexer()
     {
         _simple_tok_strings = {
-            { "=", tokens::TokenType::EQUALS_SIGN },
-            { "-", tokens::TokenType::MINUS_SIGN },
-            { "+", tokens::TokenType::PLUS_SIGN },
-            { "*", tokens::TokenType::ASTERISK },
-            { "/", tokens::TokenType::FORWARD_SLASH },
-            { ";", tokens::TokenType::SEMICOLON },
-            { "(", tokens::TokenType::OPEN_PARENTHESIS },
-            { ")", tokens::TokenType::CLOSE_PARENTHESIS },
-            { "{", tokens::TokenType::OPEN_BRACE },
-            { "}", tokens::TokenType::CLOSE_BRACE },
+            { "=",     tokens::TokenType::EQUALS_SIGN },
+            { "-",     tokens::TokenType::MINUS_SIGN },
+            { "+",     tokens::TokenType::PLUS_SIGN },
+            { "*",     tokens::TokenType::ASTERISK },
+            { "/",     tokens::TokenType::FORWARD_SLASH },
+            { ";",     tokens::TokenType::SEMICOLON },
+            { "(",     tokens::TokenType::OPEN_PARENTHESIS },
+            { ")",     tokens::TokenType::CLOSE_PARENTHESIS },
+            { "{",     tokens::TokenType::OPEN_BRACE },
+            { "}",     tokens::TokenType::CLOSE_BRACE },
+            { "<",     tokens::TokenType::LESS_THAN_OP },
+            { "<=",    tokens::TokenType::LESS_THAN_OR_EQUAL_OP },
+            { ">",     tokens::TokenType::MORE_THAN_OP },
+            { ">=",    tokens::TokenType::MORE_THAN_OR_EQUAL_OP },
+            { "==",    tokens::TokenType::DOUBLE_EQUALS },
             { "print", tokens::TokenType::PRINT_KEYWORD },
-            { "if", tokens::TokenType::IF_KEYWORD },
-            { "for", tokens::TokenType::FOR_KEYWORD },
+            { "if",    tokens::TokenType::IF_KEYWORD },
+            { "for",   tokens::TokenType::FOR_KEYWORD },
         };
     }
     

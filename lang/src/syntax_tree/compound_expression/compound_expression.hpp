@@ -20,7 +20,18 @@ namespace syntax_tree::compound_expression
         std::optional<PrefixType> _possible_prefix_type;
     };
 
-    enum OperatorType { PLUS_OP, MINUS_OP, MULT_OP, DIV_OP, ASSIGNMENT_OP };
+    enum OperatorType {
+        PLUS_OP,
+        MINUS_OP,
+        MULT_OP,
+        DIV_OP,
+        ASSIGNMENT_OP,
+        LESS_THAN_OP,
+        LESS_THAN_OR_EQUAL_OP,
+        MORE_THAN_OP,
+        MORE_THAN_OR_EQUAL_OP,
+        EQUALITY_COMPARISON_OP
+    };
     class CompoundExpressionSuffix
     {
     public:

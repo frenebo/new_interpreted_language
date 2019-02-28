@@ -1,6 +1,5 @@
-a = 1 + 9*30 + 4;
-condition = 2;
-for (a;condition;a){
-    print a;
-    condition = condition - 1;
+
+for (i = 0; i < 10; i = i + 1)
+{
+    print i;
 }

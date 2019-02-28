@@ -73,6 +73,18 @@ namespace bytecode_printer
         {
             std::cout << "STACK DUPLICATE\n";
         }
+        else if (std::holds_alternative<bytecode::instructions::StackCompareLessThan>(contained_instruction))
+        {
+            std::cout << "STACK COMPARE LESS THAN\n";
+        }
+        else if (std::holds_alternative<bytecode::instructions::StackCompareLessThanOrEqualTo>(contained_instruction))
+        {
+            std::cout << "STACK COMPARE LESS THAN OR EQUAL TO\n";
+        }
+        else if (std::holds_alternative<bytecode::instructions::StackApplyNot>(contained_instruction))
+        {
+            std::cout << "STACK APPLY NOT OPERATION\n";
+        }
         else
         {
             std::cout << "unimplemented bytecode instruction print\n";

@@ -8,7 +8,6 @@
 #include "./bytecode_compiler/bytecode_compiler.hpp"
 #include "./bytecode_printer/bytecode_printer.hpp"
 
-
 int main(int argc, char *argv[])
 {
 	if (argc != 2)

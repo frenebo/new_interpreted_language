@@ -14,12 +14,19 @@ namespace bytecode_compiler
         {
             case syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP:
                 return 0;
+            case syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP:
+                return 1;
+            case syntax_tree::compound_expression::OperatorType::LESS_THAN_OP:
+            case syntax_tree::compound_expression::OperatorType::LESS_THAN_OR_EQUAL_OP:
+            case syntax_tree::compound_expression::OperatorType::MORE_THAN_OP:
+            case syntax_tree::compound_expression::OperatorType::MORE_THAN_OR_EQUAL_OP:
+                return 2;
             case syntax_tree::compound_expression::OperatorType::MINUS_OP:
             case syntax_tree::compound_expression::OperatorType::PLUS_OP:
-                return 1;
+                return 3;
             case syntax_tree::compound_expression::OperatorType::MULT_OP:
             case syntax_tree::compound_expression::OperatorType::DIV_OP:
-                return 2;
+                return 4;
         }
         return BytecodeCompilerError("Unimplemented op type priority\n");
     }
@@ -160,6 +167,38 @@ namespace bytecode_compiler
             {
                 instructions.push_back(bytecode::instructions::InstructionContainer(
                     bytecode::instructions::StackAdd()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::LESS_THAN_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareLessThan()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::LESS_THAN_OR_EQUAL_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareLessThanOrEqualTo()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::MORE_THAN_OP)
+            {
+                // more than is the same as not less than or equal to
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareLessThanOrEqualTo()
+                ));
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackApplyNot()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::MORE_THAN_OR_EQUAL_OP)
+            {
+                // more than or equal to is the same as not less than
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareLessThan()
+                ));
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackApplyNot()
                 ));
             }
             else
