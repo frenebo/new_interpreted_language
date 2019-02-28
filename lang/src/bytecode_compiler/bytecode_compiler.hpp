@@ -22,10 +22,12 @@ namespace bytecode_compiler
     class BytecodeCompiler
     {
     public:
-        BytecodeCompiler();
-
         typedef std::vector<bytecode::instructions::InstructionContainer> InstructionsVec;
         typedef std::variant<InstructionsVec, BytecodeCompilerError> InstructionsOrErr;
+        
+        static void push_instructions(InstructionsVec & target_vec, const InstructionsVec & source_vec);
+        
+        BytecodeCompiler();
         
         InstructionsOrErr compile_statement_series(const syntax_tree::statement_series::StatementSeries & statement_series);
     private:
@@ -33,14 +35,11 @@ namespace bytecode_compiler
         InstructionsOrErr compile_compound_expression_statement(const syntax_tree::statements::CompoundExpressionStatement & compound_expression_statement);
         InstructionsOrErr compile_print_statement(const syntax_tree::statements::PrintStatement & print_statement);
         InstructionsOrErr compile_if_statement(const syntax_tree::statements::IfStatement & if_statement);
-        InstructionsOrErr instructions_to_evaluate_compound_exp_to_stack(const syntax_tree::compound_expression::CompoundExpression & compound_exp);
-        InstructionsOrErr instructions_to_evaluate_possibly_prefixed_terminal_to_stack(const syntax_tree::compound_expression::PossiblyPrefixedTerminal & possibly_prefixed_terminal_expression);
-        InstructionsOrErr instructions_to_evaluate_terminal_to_stack(const syntax_tree::terminal_expressions::TerminalExpressionContainer & terminal_expression);
-        InstructionsOrErr instruction_to_evaluate_number_expression_to_stack(const syntax_tree::terminal_expressions::NumberExpression & number_expression);
-        InstructionsOrErr instruction_to_evaluate_identifier_to_stack(const syntax_tree::terminal_expressions::IdentifierExpression & identifier_expression);
-        InstructionsOrErr instructions_for_stack_operation(syntax_tree::compound_expression::OperatorType op_type);
+        InstructionsOrErr compile_for_statement(const syntax_tree::statements::ForLoopStatement & if_statement);
+        InstructionsOrErr compile_compound_exp_evaluation(const syntax_tree::compound_expression::CompoundExpression & compound_exp);
+        InstructionsOrErr compile_possibly_prefixed_terminal_evaluation(const syntax_tree::compound_expression::PossiblyPrefixedTerminal & possibly_prefixed_terminal_expression);
+        InstructionsOrErr compile_terminal_evaluation(const syntax_tree::terminal_expressions::TerminalExpressionContainer & terminal_expression);
 
-        static void push_instructions(InstructionsVec & target_vec, const InstructionsVec & source_vec);
     };
 }
 

@@ -2,7 +2,6 @@
 
 namespace bytecode_compiler
 {
-
     BytecodeCompiler::InstructionsOrErr BytecodeCompiler::compile_statement_series(const syntax_tree::statement_series::StatementSeries & statement_series)
     {
         std::vector<bytecode::instructions::InstructionContainer> instructions;

@@ -85,10 +85,12 @@ namespace parser::statements
 
         // increment expression
         auto try_parse_increment_exp =
-            parser::compound_expression::parse_compound_expression(tokens, start_idx + consumed_count, tokens::TokenType::SEMICOLON);
+            parser::compound_expression::parse_compound_expression(tokens, start_idx + consumed_count, tokens::TokenType::CLOSE_PARENTHESIS);
         if (std::holds_alternative<ParseError>(try_parse_increment_exp))
         {
-            return std::get<ParseError>(try_parse_increment_exp);
+            ParseError exp_parse_err = std::get<ParseError>(try_parse_increment_exp);
+            std::string message = "Could not parse for loop increment expression: " + exp_parse_err.message();
+            return ParseError(message);
         }
         auto parse_increment_exp_result =
             std::get<ParseResult<syntax_tree::compound_expression::CompoundExpression>>(try_parse_increment_exp);

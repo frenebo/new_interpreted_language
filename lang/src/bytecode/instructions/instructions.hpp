@@ -47,6 +47,7 @@ namespace bytecode::instructions
     };
 
     class StackPop {};
+    class StackDuplicate {};
 
     class SkipNextInstructionIfStackValueTruthy {};
     class SkipNextInstructionIfStackValueFalsy {};
@@ -74,6 +75,7 @@ namespace bytecode::instructions
             StackStoreToVariable,
             StackLoadFromVariable,
             StackPop,
+            StackDuplicate,
             GotoRelativePosition,
             SkipNextInstructionIfStackValueFalsy,
             SkipNextInstructionIfStackValueTruthy

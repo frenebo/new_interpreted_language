@@ -1,8 +1,6 @@
-print 1;
-a = 1;
-b = a + 1;
-print b;
-c = b + 2 - 1;
-print c;
-a = 1/2;
-print a;
+a = 1 + 9*30 + 4;
+condition = 2;
+for (a;condition;a){
+    print a;
+    condition = condition - 1;
+}

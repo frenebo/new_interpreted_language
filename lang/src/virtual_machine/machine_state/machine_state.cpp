@@ -1,7 +1,13 @@
-#include <iostream>
+
 #include "./machine_state.hpp"
 #include "../data_container_utils/data_container_utils.hpp"
 
+#define MACHINE_STATE_DEBUG
+
+#ifdef MACHINE_STATE_DEBUG
+#include <iostream>
+#include "../../bytecode_printer/bytecode_printer.hpp"
+#endif
 
 namespace virtual_machine::machine_state
 {
@@ -29,6 +35,7 @@ namespace virtual_machine::machine_state
 
     std::optional<MachineRuntimeError> MachineState::execute_next_instruction()
     {
+
         if (_instruction_memory.position() >= _instruction_memory.instructions().size())
         {
             _done = true;
@@ -37,6 +44,11 @@ namespace virtual_machine::machine_state
 
         auto current_instruction_container = _instruction_memory.instructions()[_instruction_memory.position()];
         auto current_instruction = current_instruction_container.contained_instruction();
+
+    #ifdef MACHINE_STATE_DEBUG
+        std::cout << "Executing instructions: ";
+        bytecode_printer::print_instruction(current_instruction_container);
+    #endif
 
         // stack int add
         if (std::holds_alternative<bytecode::instructions::StackAdd>(current_instruction))
@@ -97,10 +109,34 @@ namespace virtual_machine::machine_state
             int relative_pos = std::get<bytecode::instructions::GotoRelativePosition>(current_instruction).move_distance();
             return execute_goto_relative_instruction_location(relative_pos);
         }
+        else if (std::holds_alternative<bytecode::instructions::StackDuplicate>(current_instruction))
+        {
+            return execute_stack_duplicate();
+        }
+        else if (std::holds_alternative<bytecode::instructions::StackPop>(current_instruction))
+        {
+            return execute_stack_pop();
+        }
         else
         {
             return MachineRuntimeError("UNIMPLEMENTED INSTRUCTION");
         }
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_duplicate()
+    {
+        auto try_get_stack_val = _data_stack.pop();
+        if (!try_get_stack_val.has_value())
+        {
+            return MachineRuntimeError("Stack error - ran out of values");
+        }
+
+        _data_stack.push(*try_get_stack_val);
+        _data_stack.push(*try_get_stack_val);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
     }
 
     std::optional<MachineRuntimeError> MachineState::execute_goto_relative_instruction_location(int relative_pos)
@@ -338,10 +374,10 @@ namespace virtual_machine::machine_state
         {
             return MachineRuntimeError("Stack error - ran out of values");
         }
-        else
-        {
-            return std::optional<MachineRuntimeError>();
-        }
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+        
+        return std::optional<MachineRuntimeError>();
     }
 
     bool MachineState::machine_done() const

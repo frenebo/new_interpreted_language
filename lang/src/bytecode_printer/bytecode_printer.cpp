@@ -69,6 +69,10 @@ namespace bytecode_printer
         {
             std::cout << "SKIP NEXT INSTRUCTION IF STACK VALUE FALSY\n";
         }
+        else if (std::holds_alternative<bytecode::instructions::StackDuplicate>(contained_instruction))
+        {
+            std::cout << "STACK DUPLICATE\n";
+        }
         else
         {
             std::cout << "unimplemented bytecode instruction print\n";
