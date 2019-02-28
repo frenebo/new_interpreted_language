@@ -1,11 +1,11 @@
+#include <iostream>
 
 #include "./machine_state.hpp"
 #include "../data_container_utils/data_container_utils.hpp"
 
-#define MACHINE_STATE_DEBUG
+// #define MACHINE_STATE_DEBUG
 
 #ifdef MACHINE_STATE_DEBUG
-#include <iostream>
 #include "../../bytecode_printer/bytecode_printer.hpp"
 #endif
 

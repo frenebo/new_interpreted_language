@@ -11,6 +11,8 @@ namespace tokens
         OPEN_BRACE,
         CLOSE_BRACE,
         EQUALS_SIGN,
+        PLUS_EQUALS,
+        MINUS_EQUALS,
         PLUS_SIGN,
         MINUS_SIGN,
         ASTERISK,

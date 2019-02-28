@@ -13,6 +13,8 @@ namespace bytecode_compiler
         switch (op_type)
         {
             case syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP:
+            case syntax_tree::compound_expression::OperatorType::MINUS_EQUALS_ASSIGNMENT_OP:
+            case syntax_tree::compound_expression::OperatorType::PLUS_EQUALS_ASSIGNMENT_OP:
                 return 0;
             case syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP:
                 return 1;
@@ -95,29 +97,64 @@ namespace bytecode_compiler
         const compound_exp_tree::CompoundExpNodeContainer & rhs =
             exp_node.rhs();
         
-        if (op_type == syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP)
+        // the assignment op is the one operation where the left side may start of as undefined.
+        // if the statement is "a = 1", and a is a new variable, you can't evaluate the left hand side (a)
+        if (
+            op_type == syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP ||
+            op_type == syntax_tree::compound_expression::OperatorType::MINUS_EQUALS_ASSIGNMENT_OP ||
+            op_type == syntax_tree::compound_expression::OperatorType::PLUS_EQUALS_ASSIGNMENT_OP)
         {
+            if (!std::holds_alternative<compound_exp_tree::CompoundExpVariableNode>(lhs.contained()))
+            {
+                return BytecodeCompilerError("Invalid left side of assignment: must be variable");
+            }
+            std::string variable_name = std::get<compound_exp_tree::CompoundExpVariableNode>(lhs.contained()).variable_name();
+            
             auto try_convert_rhs_to_value_node = convert_exp_node_to_value_node(rhs.contained());
             if (std::holds_alternative<BytecodeCompilerError>(try_convert_rhs_to_value_node))
             {
                 return std::get<BytecodeCompilerError>(try_convert_rhs_to_value_node);
             }
-            
-            if (!std::holds_alternative<compound_exp_tree::CompoundExpVariableNode>(lhs.contained()))
-            {
-                return BytecodeCompilerError("Invalid left side of assignment: must be variable");
-            }
 
-            // the operation starts off with evaluating the right hand side
-            std::vector<bytecode::instructions::InstructionContainer> instructions =
-                std::get<compound_exp_tree::CompoundExpValueNode>(try_convert_rhs_to_value_node).instructions();
+            BytecodeCompiler::InstructionsVec rhs_evaluate_instructions = std::get<compound_exp_tree::CompoundExpValueNode>(try_convert_rhs_to_value_node).instructions();
+            
+            std::vector<bytecode::instructions::InstructionContainer> instructions;
+
+            if (op_type == syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP)
+            {
+                // the operation starts off with evaluating the right hand side
+                BytecodeCompiler::push_instructions(instructions, rhs_evaluate_instructions);
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::MINUS_EQUALS_ASSIGNMENT_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackLoadFromVariable(variable_name)
+                ));
+                BytecodeCompiler::push_instructions(instructions, rhs_evaluate_instructions);
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackSubtract()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::PLUS_EQUALS_ASSIGNMENT_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackLoadFromVariable(variable_name)
+                ));
+                BytecodeCompiler::push_instructions(instructions, rhs_evaluate_instructions);
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackAdd()
+                ));
+            }
+            else
+            {
+                return BytecodeCompilerError("Unimplemented assignment operator compile");
+            }
             
             instructions.push_back(bytecode::instructions::InstructionContainer(
                 bytecode::instructions::StackDuplicate()
             ));
-            auto lhs_variable_node = std::get<compound_exp_tree::CompoundExpVariableNode>(lhs.contained());
             instructions.push_back(bytecode::instructions::InstructionContainer(
-                bytecode::instructions::StackStoreToVariable(lhs_variable_node.variable_name())
+                bytecode::instructions::StackStoreToVariable(variable_name)
             ));
 
             return instructions;

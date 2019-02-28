@@ -26,6 +26,8 @@ namespace syntax_tree::compound_expression
         MULT_OP,
         DIV_OP,
         ASSIGNMENT_OP,
+        MINUS_EQUALS_ASSIGNMENT_OP,
+        PLUS_EQUALS_ASSIGNMENT_OP,
         LESS_THAN_OP,
         LESS_THAN_OR_EQUAL_OP,
         MORE_THAN_OP,

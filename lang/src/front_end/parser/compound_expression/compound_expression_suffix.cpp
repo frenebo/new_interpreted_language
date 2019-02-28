@@ -29,6 +29,14 @@ namespace parser::compound_expression
         {
             op_type = syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP;
         }
+        else if (next_token_type == tokens::TokenType::PLUS_EQUALS)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::PLUS_EQUALS_ASSIGNMENT_OP;
+        }
+        else if (next_token_type == tokens::TokenType::MINUS_EQUALS)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::MINUS_EQUALS_ASSIGNMENT_OP;
+        }
         else if (next_token_type == tokens::TokenType::LESS_THAN_OP)
         {
             op_type = syntax_tree::compound_expression::OperatorType::LESS_THAN_OP;

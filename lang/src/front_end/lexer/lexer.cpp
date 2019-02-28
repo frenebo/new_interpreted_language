@@ -9,6 +9,8 @@ namespace lexer
     {
         _simple_tok_strings = {
             { "=",     tokens::TokenType::EQUALS_SIGN },
+            { "+=",    tokens::TokenType::PLUS_EQUALS },
+            { "-=",    tokens::TokenType::MINUS_EQUALS },
             { "-",     tokens::TokenType::MINUS_SIGN },
             { "+",     tokens::TokenType::PLUS_SIGN },
             { "*",     tokens::TokenType::ASTERISK },

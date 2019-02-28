@@ -16,6 +16,10 @@ namespace tokens
             return "close brace";
         case EQUALS_SIGN:
             return "equals sign";
+        case PLUS_EQUALS:
+            return "plus equals";
+        case MINUS_EQUALS:
+            return "minus equals";
         case PLUS_SIGN:
             return "plus sign";
         case MINUS_SIGN:
