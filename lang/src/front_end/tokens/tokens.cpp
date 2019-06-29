@@ -56,11 +56,15 @@ namespace tokens
             return ">= operator";
         case DOUBLE_EQUALS:
             return "== operator";
+        case TRUE_KEYWORD:
+            return "true keyword";
+        case FALSE_KEYWORD:
+            return "false keyword";
         default:
             return "unimplemented token string";
         }
     }
-    
+
     Token::Token(TokenType token_type, std::string content_text)
     : _token_type(token_type),
     _content_text(content_text)
