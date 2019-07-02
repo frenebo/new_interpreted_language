@@ -1,6 +1,7 @@
 #ifndef BYTECODE_COMPILER_COMPOUND_EXP_TREE_HPP
 #define BYTECODE_COMPILER_COMPOUND_EXP_TREE_HPP
 
+#include <memory>
 #include <string>
 
 #include "../../syntax_tree/compound_expression/compound_expression.hpp"
