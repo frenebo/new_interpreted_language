@@ -1,5 +1,4 @@
 #include <iostream>
-// #include <fstream>
 
 #include "./bytecode/instructions/instructions.hpp"
 #include "./front_end/front_end.hpp"
@@ -8,48 +7,15 @@
 #include "./bytecode_compiler/bytecode_compiler.hpp"
 #include "./bytecode_printer/bytecode_printer.hpp"
 
-int main(int argc, char *argv[])
+
+void try_run_code(std::string input_text)
 {
-    std::string input_text =
-        "for (i = 0; i < 3; i += 1)"
-        "{"
-        "   print i;"
-        "}";
-	// if (argc != 2)
-    // {
-    //     std::cout << "Program takes one argument: input file name\n";
-    //     return 1;
-    // }
-
-    // std::string file_name = std::string(argv[1]);
-
-    // std::ifstream input_file = std::ifstream(file_name);
-
-    // std::string input_text;
-    // if (input_file.is_open())
-    // {
-    //     input_file.seekg(0, std::ios::end);
-    //     input_text.reserve(input_file.tellg());
-    //     input_file.seekg(0, std::ios::beg);
-
-    //     input_text.assign(
-    //         std::istreambuf_iterator<char>(input_file),
-    //         std::istreambuf_iterator<char>()
-    //     );
-    // }
-    // else
-    // {
-    //     std::cout << "Could not open file \"" << file_name << "\"\n";
-    //     return 1;
-    // }
-
 	auto try_parse = front_end::parse_program(input_text);
 
 	if (std::holds_alternative<front_end::FrontEndError>(try_parse))
 	{
 		front_end::FrontEndError err = std::get<front_end::FrontEndError>(try_parse);
 		std::cout << "Syntax Error: " << err.message() << "\n";
-		return 1;
 	}
 
 	auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(try_parse);
@@ -60,7 +26,6 @@ int main(int argc, char *argv[])
     {
         bytecode_compiler::BytecodeCompilerError compiler_err = std::get<bytecode_compiler::BytecodeCompilerError>(try_compile_instructions);
         std::cout << "Compiler Error: " << compiler_err.message() << "\n";
-        return 1;
     }
 
     std::vector<bytecode::instructions::InstructionContainer> instructions =
@@ -72,8 +37,65 @@ int main(int argc, char *argv[])
     if (runtime_error_possible.has_value())
     {
         std::cout << "Runtime Error: " << runtime_error_possible->message() << "\n";
+    }
+}
+
+#ifdef FOR_EMSCRIPTEN
+extern "C" {
+    int run_code_string(char* text)
+    {
+        try_run_code(std::string(text));
+    }
+}
+
+int main() {
+    return 0;
+}
+
+#else
+
+#include <fstream>
+// void
+
+int main(int argc, char *argv[])
+{
+    // std::string input_text =
+    //     "for (i = 0; i < 3; i += 1)"
+    //     "{"
+    //     "   print i;"
+    //     "}";
+
+	if (argc != 2)
+    {
+        std::cout << "Program takes one argument: input file name\n";
         return 1;
     }
 
+    std::string file_name = std::string(argv[1]);
+
+    std::ifstream input_file = std::ifstream(file_name);
+
+    std::string input_text;
+    if (input_file.is_open())
+    {
+        input_file.seekg(0, std::ios::end);
+        input_text.reserve(input_file.tellg());
+        input_file.seekg(0, std::ios::beg);
+
+        input_text.assign(
+            std::istreambuf_iterator<char>(input_file),
+            std::istreambuf_iterator<char>()
+        );
+    }
+    else
+    {
+        std::cout << "Could not open file \"" << file_name << "\"\n";
+        return 1;
+    }
+
+    try_run_code(input_text);
+
 	return 0;
 }
+
+#endif
