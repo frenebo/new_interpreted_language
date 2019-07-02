@@ -32,7 +32,7 @@ namespace lexer
             { "false", tokens::TokenType::FALSE_KEYWORD },
         };
     }
-    
+
     std::variant<std::vector<tokens::Token>, LexErrorMessage> Lexer::lex_text(const std::string & text) const
     {
         auto simple_lex_result = lex_simple(text);
@@ -43,7 +43,7 @@ namespace lexer
             LexErrorMessage lex_error_mssg = std::get<LexErrorMessage>(simple_lex_result);
             return lex_error_mssg;
         }
-        
+
         // otherwise, get the result tokens of the simple lexer
         std::vector<tokens::Token> including_whitespace = std::get<std::vector<tokens::Token>>(simple_lex_result);
 
@@ -92,7 +92,7 @@ namespace lexer
 
         return tokens;
     }
-    
+
     std::variant<tokens::Token, LexErrorMessage> Lexer::try_match_tok(const std::string & text, const unsigned long start_idx) const
     {
         std::optional<tokens::Token> longest_match;
@@ -115,7 +115,7 @@ namespace lexer
                 longest_match = potential_match;
             }
         }
-        
+
         if (longest_match.has_value())
         {
             return *longest_match;
@@ -136,7 +136,7 @@ namespace lexer
         while (consumed_count < text.length() - start_idx)
         {
             char next_char = text[start_idx + consumed_count];
-            
+
             if (next_char == '.')
             {
                 // only one period can be in a number
@@ -184,14 +184,14 @@ namespace lexer
     std::optional<tokens::Token> Lexer::try_match_identifier(const std::string & text, const unsigned long start_idx) const
     {
         // the first character of an identifier must be a letter
-        if (!isalpha(text[start_idx])) return std::optional<tokens::Token>();
+        if (!isalpha(text[start_idx]) && text[start_idx] != '_') return std::optional<tokens::Token>();
 
         // one for the first character that has been verified to be a letter
         unsigned long match_length = 1;
 
         while (
             match_length < text.length() - start_idx &&
-            isalnum(text[start_idx + match_length])
+            (isalnum(text[start_idx + match_length]) || text[start_idx + match_length] == '_')
         ) {
             match_length++;
         }
@@ -227,11 +227,11 @@ namespace lexer
     std::optional<tokens::Token> Lexer::longest_simple_tok_match(const std::string & text, const unsigned long start_idx) const
     {
         std::optional<tokens::Token> longest_match;
-        
+
         for (const std::pair<std::string, tokens::TokenType>& pair : _simple_tok_strings)
         {
             const std::string & match_tok_string = pair.first;
-            
+
             // if there has been a previous match and that match is longer than this one could be,
             // there's no point in testing this one
             if (longest_match.has_value() &&
@@ -239,9 +239,9 @@ namespace lexer
             {
                 continue;
             }
-            
+
             int text_compare = text.compare(start_idx, match_tok_string.length(), match_tok_string);
-            
+
             // if the comparison doesn't return 0 for exact match
             if (text_compare != 0)
             {

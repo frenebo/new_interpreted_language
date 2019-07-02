@@ -16,6 +16,7 @@ void try_run_code(std::string input_text)
 	{
 		front_end::FrontEndError err = std::get<front_end::FrontEndError>(try_parse);
 		std::cout << "Syntax Error: " << err.message() << "\n";
+        return;
 	}
 
 	auto statement_series = std::get<syntax_tree::statement_series::StatementSeries>(try_parse);
@@ -26,6 +27,7 @@ void try_run_code(std::string input_text)
     {
         bytecode_compiler::BytecodeCompilerError compiler_err = std::get<bytecode_compiler::BytecodeCompilerError>(try_compile_instructions);
         std::cout << "Compiler Error: " << compiler_err.message() << "\n";
+        return;
     }
 
     std::vector<bytecode::instructions::InstructionContainer> instructions =
@@ -37,6 +39,7 @@ void try_run_code(std::string input_text)
     if (runtime_error_possible.has_value())
     {
         std::cout << "Runtime Error: " << runtime_error_possible->message() << "\n";
+        return;
     }
 }
 
@@ -45,6 +48,7 @@ extern "C" {
     int run_code_string(char* text)
     {
         try_run_code(std::string(text));
+        return 0;
     }
 }
 
