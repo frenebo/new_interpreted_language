@@ -3,12 +3,26 @@
 
 #include <variant>
 #include <memory>
+#include <vector>
+#include <optional>
 
 #include "../compound_expression/compound_expression.hpp"
 
+namespace syntax_tree::statements
+{
+    class StatementContainer;
+}
+
 namespace syntax_tree::statement_series
 {
-    class StatementSeries;
+    class StatementSeries
+    {
+    public:
+        StatementSeries(std::vector<syntax_tree::statements::StatementContainer> statements);
+        const std::vector<syntax_tree::statements::StatementContainer> & statements() const;
+    private:
+        std::vector<syntax_tree::statements::StatementContainer> _statements;
+    };
 }
 
 namespace syntax_tree::statements
@@ -40,30 +54,78 @@ namespace syntax_tree::statements
      * This way, the if statement will not contain a statement sequence in full, only
      * a pointer to one.
      */
-
-    class ContainableStatementSeries
+    template<class T>
+    class PointerHolder
     {
     public:
-        ContainableStatementSeries(syntax_tree::statement_series::StatementSeries statement_series);
-        const syntax_tree::statement_series::StatementSeries & statement_series() const;
+        PointerHolder(T contained)
+        : _contained(std::make_unique<T>(contained))
+        {
+        }
+        const T & contained() const
+        {
+            return *_contained;
+        }
 
-        ~ContainableStatementSeries();
-        ContainableStatementSeries(const ContainableStatementSeries &);
-        ContainableStatementSeries & operator=(const ContainableStatementSeries & rhs);
+        ~PointerHolder()
+        {
+            _contained.reset(nullptr);
+        }
+        PointerHolder(const PointerHolder & rhs)
+        : _contained(std::make_unique<T>(rhs.contained()))
+        {
+        }
+
+        PointerHolder & operator=(const PointerHolder & rhs)
+        {
+            _contained.reset(nullptr);
+            _contained = std::make_unique<T>(rhs.contained());
+
+            return *this;
+        }
     private:
-        std::unique_ptr<syntax_tree::statement_series::StatementSeries> _statement_series;
+        std::unique_ptr<T> _contained;
+    };
+
+    class IfStatement;
+
+    class PlainElseBlock
+    {
+    public:
+        PlainElseBlock(syntax_tree::statement_series::StatementSeries body_statement_series);
+        const syntax_tree::statement_series::StatementSeries & body_statement_series() const;
+    private:
+        PointerHolder<syntax_tree::statement_series::StatementSeries> _body_statement_series;
+    };
+
+    class ElseIfBlock
+    {
+    public:
+        ElseIfBlock(IfStatement if_statement);
+        const IfStatement & if_statement() const;
+    private:
+        PointerHolder<IfStatement> _if_statement;
     };
 
     class IfStatement
     {
     public:
-        IfStatement(syntax_tree::compound_expression::CompoundExpression if_condition, syntax_tree::statement_series::StatementSeries body_statement_series);
+        typedef std::optional<std::variant<PlainElseBlock, ElseIfBlock>> OptionalElseVariant;
+        IfStatement(
+            syntax_tree::compound_expression::CompoundExpression if_condition,
+            syntax_tree::statement_series::StatementSeries body_statement_series,
+            OptionalElseVariant else_block
+        );
         const syntax_tree::compound_expression::CompoundExpression & if_condition() const;
         const syntax_tree::statement_series::StatementSeries & body_statement_series() const;
+        const OptionalElseVariant & else_block() const;
     private:
         syntax_tree::compound_expression::CompoundExpression _if_condition;
-        ContainableStatementSeries _body_statement_series;
+        PointerHolder<syntax_tree::statement_series::StatementSeries> _body_statement_series;
+        OptionalElseVariant _else_block;
     };
+
+
 
     class ForLoopStatement
     {
@@ -82,7 +144,7 @@ namespace syntax_tree::statements
         syntax_tree::compound_expression::CompoundExpression _setup_expression;
         syntax_tree::compound_expression::CompoundExpression _condition_expression;
         syntax_tree::compound_expression::CompoundExpression _increment_expression;
-        ContainableStatementSeries _loop_body;
+        PointerHolder<syntax_tree::statement_series::StatementSeries> _loop_body;
     };
 
     class StatementContainer

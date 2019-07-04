@@ -108,7 +108,86 @@ namespace parser::statements
         // increment consumed count for the close brace
         consumed_count++;
 
-        auto if_statement = syntax_tree::statements::IfStatement(condition_expression, if_body_statement_series);
-        return ParseResult<syntax_tree::statements::IfStatement>(if_statement, consumed_count);
+        if (tokens[start_idx + consumed_count].token_type() == tokens::TokenType::ELSE_KEYWORD)
+        {
+            consumed_count++; // for else keyword
+            if (tokens[start_idx + consumed_count].token_type() == tokens::TokenType::OPEN_BRACE)
+            {
+                consumed_count++; // for open brace
+                auto try_parse_else_body =
+                    parser::statement_series::parse_statement_series(tokens, start_idx + consumed_count, tokens::TokenType::CLOSE_BRACE);
+
+                if (std::holds_alternative<ParseError>(try_parse_else_body))
+                {
+                    return std::get<ParseError>(try_parse_else_body);
+                }
+                auto parse_else_body_result =
+                    std::get<ParseResult<syntax_tree::statement_series::StatementSeries>>(try_parse_else_body);
+
+                consumed_count += parse_else_body_result.consumed_count();
+
+                auto if_statement = syntax_tree::statements::IfStatement(
+                    condition_expression,
+                    if_body_statement_series,
+                    syntax_tree::statements::IfStatement::OptionalElseVariant(
+                        syntax_tree::statements::PlainElseBlock(parse_else_body_result.contained())
+                    )
+                );
+
+                tokens::TokenType expect_another_close_brace = tokens[start_idx + consumed_count].token_type();
+                if (expect_another_close_brace != tokens::TokenType::CLOSE_BRACE)
+                {
+                    return ParseError(
+                        "Expected " + tokens::tok_type_to_str(tokens::TokenType::CLOSE_BRACE) +
+                        ", got " + tokens::tok_type_to_str(expect_another_close_brace),
+                        tokens[start_idx + consumed_count]
+                    );
+                }
+                // increment consumed count for the close brace
+                consumed_count++;
+
+                return ParseResult<syntax_tree::statements::IfStatement>(if_statement, consumed_count);
+            }
+            else if (tokens[start_idx + consumed_count].token_type() == tokens::TokenType::IF_KEYWORD)
+            {
+                auto try_parse_else_if_statement = parse_if_statement(tokens, start_idx + consumed_count);
+                if (std::holds_alternative<ParseError>(try_parse_else_if_statement))
+                {
+                    return std::get<ParseError>(try_parse_else_if_statement);
+                }
+
+                auto parse_else_if_statement_result =
+                    std::get<ParseResult<syntax_tree::statements::IfStatement>>(try_parse_else_if_statement);
+
+                consumed_count += parse_else_if_statement_result.consumed_count();
+
+                auto if_statement = syntax_tree::statements::IfStatement(
+                    condition_expression,
+                    if_body_statement_series,
+                    syntax_tree::statements::IfStatement::OptionalElseVariant(
+                        syntax_tree::statements::ElseIfBlock(parse_else_if_statement_result.contained())
+                    )
+                );
+
+                return ParseResult<syntax_tree::statements::IfStatement>(if_statement, consumed_count);
+            }
+            else
+            {
+                return ParseError(
+                    "Expected open brace or 'if' keyword after 'else' keyword, got " +
+                    tokens::tok_type_to_str(tokens[start_idx + consumed_count].token_type()),
+                    tokens[start_idx + consumed_count]
+                );
+            }
+        }
+        else
+        {
+            auto if_statement = syntax_tree::statements::IfStatement(
+                condition_expression,
+                if_body_statement_series,
+                syntax_tree::statements::IfStatement::OptionalElseVariant()
+            );
+            return ParseResult<syntax_tree::statements::IfStatement>(if_statement, consumed_count);
+        }
     }
 }

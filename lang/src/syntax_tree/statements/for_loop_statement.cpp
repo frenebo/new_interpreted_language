@@ -11,7 +11,7 @@ namespace syntax_tree::statements
     : _setup_expression(setup_expression),
     _condition_expression(condition_expression),
     _increment_expression(increment_expression),
-    _loop_body(ContainableStatementSeries(loop_body))
+    _loop_body(loop_body)
     {
     }
     const syntax_tree::compound_expression::CompoundExpression & ForLoopStatement::setup_expression() const
@@ -31,6 +31,6 @@ namespace syntax_tree::statements
 
     const syntax_tree::statement_series::StatementSeries & ForLoopStatement::loop_body() const
     {
-        return _loop_body.statement_series();
+        return _loop_body.contained();
     }
 }
