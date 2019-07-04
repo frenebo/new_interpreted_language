@@ -13,6 +13,9 @@ namespace virtual_machine::data_container_utils
         bool lhs_is_number = lhs_is_int || lhs_is_float;
         bool rhs_is_number = rhs_is_int || rhs_is_float;
 
+        bool lhs_is_string = std::holds_alternative<data_container::StringContainer>(lhs.contained());
+        bool rhs_is_string = std::holds_alternative<data_container::StringContainer>(rhs.contained());
+
         // number addition
         if (lhs_is_number && rhs_is_number)
         {
@@ -52,6 +55,13 @@ namespace virtual_machine::data_container_utils
 
                 return data_container::DataContainer(data_container::FloatContainer(sum));
             }
+        }
+        else if (lhs_is_string && rhs_is_string)
+        {
+            const std::string & lhs_value = std::get<data_container::StringContainer>(lhs.contained()).value();
+            const std::string & rhs_value = std::get<data_container::StringContainer>(rhs.contained()).value();
+
+            return data_container::DataContainer(data_container::StringContainer(lhs_value + rhs_value));
         }
         else
         {

@@ -15,7 +15,7 @@ namespace bytecode::instructions
     class StackCompareLessThan {};
     class StackCompareLessThanOrEqualTo {};
     class StackApplyNot {};
-    
+
     class StackBoolPushConst
     {
     public:
@@ -24,7 +24,7 @@ namespace bytecode::instructions
     private:
         bool _value;
     };
-    
+
     class StackIntegerPushConst
     {
     public:
@@ -41,6 +41,15 @@ namespace bytecode::instructions
         float value() const;
     private:
         float _value;
+    };
+
+    class StackStringPushConst
+    {
+    public:
+        StackStringPushConst(std::string value);
+        const std::string & value() const;
+    private:
+        std::string _value;
     };
 
     class StackPrint {};
@@ -93,6 +102,7 @@ namespace bytecode::instructions
             StackIntegerPushConst,
             StackFloatPushConst,
             StackBoolPushConst,
+            StackStringPushConst,
             StackPrint,
             StackStoreToVariable,
             StackLoadFromVariable,

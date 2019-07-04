@@ -60,6 +60,8 @@ namespace tokens
             return "true keyword";
         case FALSE_KEYWORD:
             return "false keyword";
+        case STRING_LITERAL:
+            return "string literal";
         default:
             return "unimplemented token string";
         }

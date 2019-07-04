@@ -20,6 +20,10 @@ namespace virtual_machine::data_container_utils
         {
             return std::get<data_container::BoolContainer>(contained).value();
         }
+        else if (std::holds_alternative<data_container::StringContainer>(contained))
+        {
+            return std::get<data_container::StringContainer>(contained).value().size() == 0;
+        }
         else
         {
             return TypeError("Unimplemented data type for conversion to bool\n");

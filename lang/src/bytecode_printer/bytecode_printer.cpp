@@ -10,12 +10,12 @@ namespace bytecode_printer
             print_instruction(instruction_container);
         }
     }
-    
+
     void print_instruction(const bytecode::instructions::InstructionContainer & instruction_container)
     {
         const bytecode::instructions::InstructionContainer::VariantInstruction & contained_instruction =
             instruction_container.contained_instruction();
-        
+
         if (std::holds_alternative<bytecode::instructions::StackAdd>(contained_instruction))
         {
             std::cout << "ADD\n";
@@ -90,6 +90,12 @@ namespace bytecode_printer
             auto bool_push_const_instruction = std::get<bytecode::instructions::StackBoolPushConst>(contained_instruction);
 
             std::cout << "PUSH BOOL CONST: " << bool_push_const_instruction.value() << "\n";
+        }
+        else if (std::holds_alternative<bytecode::instructions::StackStringPushConst>(contained_instruction))
+        {
+            auto string_push_const_instruction = std::get<bytecode::instructions::StackStringPushConst>(contained_instruction);
+
+            std::cout << "PUSH STRING CONST: \"" << string_push_const_instruction.value() << "\"\n";
         }
         else
         {

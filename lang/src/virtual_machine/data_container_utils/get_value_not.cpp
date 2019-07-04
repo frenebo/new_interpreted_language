@@ -10,14 +10,14 @@ namespace virtual_machine::data_container_utils
         {
             bool val = std::get<data_container::BoolContainer>(contained).value();
             bool not_val = !val;
-            
+
             return data_container::DataContainer(
                 data_container::BoolContainer(not_val)
             );
         }
         else
         {
-            return TypeError("Invalid type operation: " + data_container::data_container_type_string(contained));
+            return TypeError("Invalid 'not' type operation: " + data_container::data_container_type_string(contained));
         }
     }
 }

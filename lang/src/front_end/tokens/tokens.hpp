@@ -21,6 +21,7 @@ namespace tokens
         INTEGER_NUM,
         FLOAT_NUM,
         IDENTIFIER,
+        STRING_LITERAL,
         PRINT_KEYWORD,
         IF_KEYWORD,
         FOR_KEYWORD,

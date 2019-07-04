@@ -135,15 +135,32 @@ namespace virtual_machine::machine_state
 
             return execute_stack_bool_push_const(push_val);
         }
+        else if (std::holds_alternative<bytecode::instructions::StackStringPushConst>(current_instruction))
+        {
+            std::string push_val = std::get<bytecode::instructions::StackStringPushConst>(current_instruction).value();
+
+            return execute_stack_string_push_const(push_val);
+        }
         else
         {
             return MachineRuntimeError("UNIMPLEMENTED INSTRUCTION");
         }
     }
-    
+
     std::optional<MachineRuntimeError> MachineState::execute_stack_bool_push_const(bool bool_to_push)
     {
         auto push_data_container = data_container::DataContainer(data_container::BoolContainer(bool_to_push));
+
+        _data_stack.push(push_data_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_string_push_const(std::string string_to_push)
+    {
+        auto push_data_container = data_container::DataContainer(data_container::StringContainer(string_to_push));
 
         _data_stack.push(push_data_container);
 
@@ -156,10 +173,10 @@ namespace virtual_machine::machine_state
     {
         auto try_get_rhs = _data_stack.pop();
         auto try_get_lhs = _data_stack.pop();
-        
+
         if (!try_get_lhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
         if (!try_get_rhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
-        
+
         auto compare_result = data_container_utils::less_than_op_containers(*try_get_lhs, *try_get_rhs);
         if (std::holds_alternative<data_container_utils::TypeError>(compare_result))
         {
@@ -180,10 +197,10 @@ namespace virtual_machine::machine_state
     {
         auto try_get_rhs = _data_stack.pop();
         auto try_get_lhs = _data_stack.pop();
-        
+
         if (!try_get_lhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
         if (!try_get_rhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
-        
+
         auto compare_result = data_container_utils::less_than_or_equal_op_containers(*try_get_lhs, *try_get_rhs);
         if (std::holds_alternative<data_container_utils::TypeError>(compare_result))
         {
@@ -474,7 +491,7 @@ namespace virtual_machine::machine_state
         }
 
         _instruction_memory.set_position(_instruction_memory.position() + 1);
-        
+
         return std::optional<MachineRuntimeError>();
     }
 

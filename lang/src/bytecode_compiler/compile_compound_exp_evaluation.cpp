@@ -41,11 +41,11 @@ namespace bytecode_compiler
     {
         const syntax_tree::terminal_expressions::TerminalExpressionContainer::VariantTerminalExp & contained =
             terminal.contained_terminal_exp();
-        
+
         if (std::holds_alternative<syntax_tree::terminal_expressions::IdentifierExpression>(contained))
         {
             auto identifier_exp = std::get<syntax_tree::terminal_expressions::IdentifierExpression>(contained);
-            
+
             return compound_exp_tree::CompoundExpNodeContainer(
                 compound_exp_tree::CompoundExpVariableNode(identifier_exp.identifier_string())
             );
@@ -95,6 +95,18 @@ namespace bytecode_compiler
                 compound_exp_tree::CompoundExpValueNode(instructions)
             );
         }
+        else if (std::holds_alternative<syntax_tree::terminal_expressions::StringLiteralExpression>(contained))
+        {
+            auto string_exp = std::get<syntax_tree::terminal_expressions::StringLiteralExpression>(contained);
+            BytecodeCompiler::InstructionsVec instructions;
+            instructions.push_back(bytecode::instructions::InstructionContainer(
+                bytecode::instructions::StackStringPushConst(string_exp.string_text())
+            ));
+
+            return compound_exp_tree::CompoundExpNodeContainer(
+                compound_exp_tree::CompoundExpValueNode(instructions)
+            );
+        }
         else
         {
             return BytecodeCompilerError("Unimplemented terminal node compilation");
@@ -109,7 +121,7 @@ namespace bytecode_compiler
         syntax_tree::compound_expression::OperatorType op_type = exp_node.op_type();
         const compound_exp_tree::CompoundExpNodeContainer & rhs =
             exp_node.rhs();
-        
+
         // the assignment op is the one operation where the left side may start of as undefined.
         // if the statement is "a = 1", and a is a new variable, you can't evaluate the left hand side (a)
         if (
@@ -122,7 +134,7 @@ namespace bytecode_compiler
                 return BytecodeCompilerError("Invalid left side of assignment: must be variable");
             }
             std::string variable_name = std::get<compound_exp_tree::CompoundExpVariableNode>(lhs.contained()).variable_name();
-            
+
             auto try_convert_rhs_to_value_node = convert_exp_node_to_value_node(rhs.contained());
             if (std::holds_alternative<BytecodeCompilerError>(try_convert_rhs_to_value_node))
             {
@@ -130,7 +142,7 @@ namespace bytecode_compiler
             }
 
             BytecodeCompiler::InstructionsVec rhs_evaluate_instructions = std::get<compound_exp_tree::CompoundExpValueNode>(try_convert_rhs_to_value_node).instructions();
-            
+
             std::vector<bytecode::instructions::InstructionContainer> instructions;
 
             if (op_type == syntax_tree::compound_expression::OperatorType::ASSIGNMENT_OP)
@@ -162,7 +174,7 @@ namespace bytecode_compiler
             {
                 return BytecodeCompilerError("Unimplemented assignment operator compile");
             }
-            
+
             instructions.push_back(bytecode::instructions::InstructionContainer(
                 bytecode::instructions::StackDuplicate()
             ));
@@ -179,22 +191,22 @@ namespace bytecode_compiler
             {
                 return std::get<BytecodeCompilerError>(try_convert_lhs_to_value_node);
             }
-            
+
             auto try_convert_rhs_to_value_node = convert_exp_node_to_value_node(rhs.contained());
             if (std::holds_alternative<BytecodeCompilerError>(try_convert_rhs_to_value_node))
             {
                 return std::get<BytecodeCompilerError>(try_convert_rhs_to_value_node);
             }
-            
+
             BytecodeCompiler::InstructionsVec lhs_evaluate_instructions =
                 std::get<compound_exp_tree::CompoundExpValueNode>(try_convert_lhs_to_value_node).instructions();
             BytecodeCompiler::InstructionsVec rhs_evaluate_instructions =
                 std::get<compound_exp_tree::CompoundExpValueNode>(try_convert_rhs_to_value_node).instructions();
-            
+
             std::vector<bytecode::instructions::InstructionContainer> instructions;
             BytecodeCompiler::push_instructions(instructions, lhs_evaluate_instructions);
             BytecodeCompiler::push_instructions(instructions, rhs_evaluate_instructions);
-            
+
             if (op_type == syntax_tree::compound_expression::OperatorType::DIV_OP)
             {
                 instructions.push_back(bytecode::instructions::InstructionContainer(
@@ -255,9 +267,9 @@ namespace bytecode_compiler
             {
                 return BytecodeCompilerError("Unimplemented operator type compilation");
             }
-            
+
             auto return_val_node = compound_exp_tree::CompoundExpValueNode (instructions);
-            
+
             return return_val_node;
         }
     }
@@ -267,7 +279,7 @@ namespace bytecode_compiler
     {
         const compound_exp_tree::CompoundExpNodeContainer::VariantCompoundExpNode & contained =
             node_container.contained();
-        
+
         if (std::holds_alternative<compound_exp_tree::CompoundExpValueNode>(contained))
         {
             // nothing needs to be changed if it's already a value node
@@ -277,14 +289,14 @@ namespace bytecode_compiler
         {
             compound_exp_tree::CompoundExpOpNode op_node =
                 std::get<compound_exp_tree::CompoundExpOpNode>(contained);
-            
+
             return convert_exp_operation_node_to_value_node(op_node);
         }
         else if (std::holds_alternative<compound_exp_tree::CompoundExpVariableNode>(contained))
         {
             compound_exp_tree::CompoundExpVariableNode variable_node =
                 std::get<compound_exp_tree::CompoundExpVariableNode>(contained);
-            
+
             BytecodeCompiler::InstructionsVec instructions;
             instructions.push_back(bytecode::instructions::InstructionContainer(
                 bytecode::instructions::StackLoadFromVariable(variable_node.variable_name())
@@ -308,7 +320,7 @@ namespace bytecode_compiler
         }
         compound_exp_tree::CompoundExpNodeContainer compiled_terminal =
             std::get<compound_exp_tree::CompoundExpNodeContainer>(try_compile_terminal);
-        
+
         if (!possibly_prefixed_terminal.possible_prefix_type().has_value())
         {
             return compiled_terminal;
@@ -317,7 +329,7 @@ namespace bytecode_compiler
         {
             syntax_tree::compound_expression::PrefixType prefix_type =
                 *possibly_prefixed_terminal.possible_prefix_type();
-            
+
             auto try_convert_terminal_to_value_node =
                 convert_exp_node_to_value_node(compiled_terminal);
 
@@ -325,13 +337,13 @@ namespace bytecode_compiler
             {
                 return std::get<BytecodeCompilerError>(try_convert_terminal_to_value_node);
             }
-            
+
             const BytecodeCompiler::InstructionsVec & terminal_evaluate_instructions =
                 std::get<compound_exp_tree::CompoundExpValueNode>(try_convert_terminal_to_value_node).instructions();
-            
+
             // start off with these instructions, then apply the prefix
             BytecodeCompiler::InstructionsVec instructions = terminal_evaluate_instructions;
-            
+
             if (prefix_type == syntax_tree::compound_expression::PrefixType::MINUS_PREFIX)
             {
                 // multiply by negative one
@@ -343,7 +355,7 @@ namespace bytecode_compiler
                 ));
 
                 compound_exp_tree::CompoundExpValueNode exp_value_node(instructions);
-                
+
                 return compound_exp_tree::CompoundExpNodeContainer(exp_value_node);
             }
             else
@@ -378,14 +390,14 @@ namespace bytecode_compiler
             indices_and_priorities.end(),
             compare_priority_pairs
         );
-        
+
         std::vector<size_t> indices;
         indices.reserve(ops.size());
         for (const std::pair<size_t, int> & pair : indices_and_priorities)
         {
             indices.push_back(pair.first);
         }
-        
+
         return indices;
     }
 
@@ -407,7 +419,7 @@ namespace bytecode_compiler
         exp_nodes.push_back(
             std::get<compound_exp_tree::CompoundExpNodeContainer>(try_compile_first_possibly_prefixed_terminal)
         );
-        
+
         // add the other terminals and operations
         for (const syntax_tree::compound_expression::CompoundExpressionSuffix & suffix : compound_exp.suffixes())
         {
@@ -459,23 +471,23 @@ namespace bytecode_compiler
         for (size_t orig_op_index : sorted_op_indices)
         {
             size_t op_index = op_current_positions_by_original_idx[orig_op_index];
-            
+
             // get the left hand and right hand sides
             compound_exp_tree::CompoundExpNodeContainer lhs = exp_nodes[op_index];
             compound_exp_tree::CompoundExpNodeContainer rhs = exp_nodes[op_index + 1];
             syntax_tree::compound_expression::OperatorType operator_type = unprocessed_ops[op_index];
-            
+
             // remove the left hand and right hand sides from exp_nodes
             exp_nodes.erase(exp_nodes.begin() + op_index);
             exp_nodes.erase(exp_nodes.begin() + op_index);
-            
+
             unprocessed_ops.erase(unprocessed_ops.begin() + op_index);
 
             auto new_op_node = compound_exp_tree::CompoundExpOpNode(lhs, operator_type, rhs);
             compound_exp_tree::CompoundExpNodeContainer new_op_container(new_op_node);
-            
+
             exp_nodes.insert(exp_nodes.begin() + op_index, new_op_container);
-            
+
             // adjust op_current_positions_by_original_idx
             for (size_t i = 0; i < op_current_positions_by_original_idx.size(); i++)
             {
@@ -488,19 +500,19 @@ namespace bytecode_compiler
                 }
             }
         }
-        
+
         // at this point, there are no unprocessed operations left
         // Try convert to value node, which contains instructions
-        
+
         auto try_convert_to_value_node = convert_exp_node_to_value_node(exp_nodes[0]);
         if (std::holds_alternative<BytecodeCompilerError>(try_convert_to_value_node))
         {
             return std::get<BytecodeCompilerError>(try_convert_to_value_node);
         }
-        
+
         compound_exp_tree::CompoundExpValueNode final_value_node =
             std::get<compound_exp_tree::CompoundExpValueNode>(try_convert_to_value_node);
-        
+
         return final_value_node.instructions();
     }
 }

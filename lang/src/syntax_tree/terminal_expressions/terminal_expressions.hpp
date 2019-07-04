@@ -35,16 +35,26 @@ namespace syntax_tree::terminal_expressions
     private:
         bool _value;
     };
-    
+
+    class StringLiteralExpression
+    {
+    public:
+        StringLiteralExpression(std::string string_text);
+        const std::string & string_text() const;
+    private:
+        std::string _string_text;
+    };
+
     class TerminalExpressionContainer
     {
     public:
         typedef std::variant<
             IdentifierExpression,
             NumberExpression,
-            BoolLiteralExpression
+            BoolLiteralExpression,
+            StringLiteralExpression
         > VariantTerminalExp;
-        
+
         TerminalExpressionContainer(VariantTerminalExp contained_terminal_exp);
         const VariantTerminalExp & contained_terminal_exp() const;
     private:

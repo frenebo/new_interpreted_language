@@ -2,10 +2,12 @@
 first = 1;
 second = 1;
 
+print "Fibonacci Sequence:";
+
 print first;
 print second;
 
-for (i = 0; i < 10; i += 1)
+for (i = 0; i < 5; i += 1)
 {
     new_second = first + second;
     first = second;

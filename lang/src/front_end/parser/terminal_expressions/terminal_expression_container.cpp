@@ -23,7 +23,10 @@ namespace parser::terminal_expressions
 
             auto terminal_exp_container = syntax_tree::terminal_expressions::TerminalExpressionContainer(identifier_expression);
 
-            return ParseResult<syntax_tree::terminal_expressions::TerminalExpressionContainer>(terminal_exp_container, consumed_count);
+            return ParseResult<syntax_tree::terminal_expressions::TerminalExpressionContainer>(
+                terminal_exp_container,
+                consumed_count
+            );
         }
         else if (next_tok_type == tokens::TokenType::FLOAT_NUM ||
             next_tok_type == tokens::TokenType::INTEGER_NUM)
@@ -42,7 +45,10 @@ namespace parser::terminal_expressions
 
             auto terminal_exp_container = syntax_tree::terminal_expressions::TerminalExpressionContainer(number_expression);
 
-            return ParseResult<syntax_tree::terminal_expressions::TerminalExpressionContainer>(terminal_exp_container, consumed_count);
+            return ParseResult<syntax_tree::terminal_expressions::TerminalExpressionContainer>(
+                terminal_exp_container,
+                consumed_count
+            );
         }
         else if (next_tok_type == tokens::TokenType::TRUE_KEYWORD ||
             next_tok_type == tokens::TokenType::FALSE_KEYWORD)
@@ -63,7 +69,29 @@ namespace parser::terminal_expressions
 
             return ParseResult<syntax_tree::terminal_expressions::TerminalExpressionContainer>(
                 parse_terminal_expression_container,
-                consumed_count);
+                consumed_count
+            );
+        }
+        else if (next_tok_type == tokens::TokenType::STRING_LITERAL)
+        {
+            auto try_parse_string_literal = parse_string_literal_expression(tokens, start_idx);
+
+            if (std::holds_alternative<ParseError>(try_parse_string_literal))
+            {
+                return std::get<ParseError>(try_parse_string_literal);
+            }
+
+            auto parse_string_literal_result = std::get<ParseResult<syntax_tree::terminal_expressions::StringLiteralExpression>>(try_parse_string_literal);
+
+            unsigned long consumed_count = parse_string_literal_result.consumed_count();
+            auto string_literal_exp = parse_string_literal_result.contained();
+
+            syntax_tree::terminal_expressions::TerminalExpressionContainer parse_terminal_expression_container(string_literal_exp);
+
+            return ParseResult<syntax_tree::terminal_expressions::TerminalExpressionContainer>(
+                parse_terminal_expression_container,
+                consumed_count
+            );
         }
         else
         {

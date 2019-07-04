@@ -21,6 +21,10 @@ namespace virtual_machine::data_container_utils
             if (val) return "true";
             else  return "false";
         }
+        else if (std::holds_alternative<data_container::StringContainer>(contained))
+        {
+            return std::get<data_container::StringContainer>(contained).value();
+        }
         else
         {
             return TypeError("Unimplemented string conversion for " + data_container::data_container_type_string(data_container));

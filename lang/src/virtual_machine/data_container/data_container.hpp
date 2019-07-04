@@ -9,10 +9,10 @@ namespace virtual_machine::data_container
     class IntegerContainer
     {
     public:
-        IntegerContainer(int value);
-        int value() const;
+        IntegerContainer(long value);
+        long value() const;
     private:
-        int _value;
+        long _value;
     };
 
     class FloatContainer
@@ -32,16 +32,26 @@ namespace virtual_machine::data_container
     private:
         bool _value;
     };
-    
+
+    class StringContainer
+    {
+    public:
+        StringContainer(std::string value);
+        const std::string & value() const;
+    private:
+        std::string _value;
+    };
+
     class DataContainer
     {
     public:
         typedef std::variant<
             IntegerContainer,
             FloatContainer,
-            BoolContainer
+            BoolContainer,
+            StringContainer
         > VariantDataContainer;
-        
+
         DataContainer(VariantDataContainer contained);
 
         const VariantDataContainer & contained() const;

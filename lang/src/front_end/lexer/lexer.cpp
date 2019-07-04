@@ -93,6 +93,44 @@ namespace lexer
         return tokens;
     }
 
+    std::optional<tokens::Token> Lexer::try_match_string_literal(const std::string & text, const unsigned long start_idx) const
+    {
+        unsigned long consumed_count = 0;
+        if (text[start_idx + consumed_count] != '"')
+        {
+            return std::optional<tokens::Token>();
+        }
+        else
+        {
+            consumed_count++;
+        }
+
+        bool is_terminated = false;
+
+        while (consumed_count < text.length() - start_idx)
+        {
+            char next_char = text[start_idx + consumed_count];
+            consumed_count++;
+
+            if (next_char == '"')
+            {
+                is_terminated = true;
+                break;
+            }
+        }
+
+        std::string matched_str = text.substr(start_idx, consumed_count);
+
+        if (is_terminated)
+        {
+            return tokens::Token(tokens::TokenType::STRING_LITERAL, start_idx, matched_str);
+        }
+        else
+        {
+            return std::optional<tokens::Token>();
+        }
+    }
+
     std::variant<tokens::Token, LexErrorMessage> Lexer::try_match_tok(const std::string & text, const unsigned long start_idx) const
     {
         std::optional<tokens::Token> longest_match;
@@ -102,6 +140,7 @@ namespace lexer
         potential_matches.push_back(try_match_identifier(text, start_idx));
         potential_matches.push_back(try_match_whitespace(text, start_idx));
         potential_matches.push_back(try_match_int_or_float(text, start_idx));
+        potential_matches.push_back(try_match_string_literal(text, start_idx));
 
         for (std::optional<tokens::Token> potential_match : potential_matches)
         {

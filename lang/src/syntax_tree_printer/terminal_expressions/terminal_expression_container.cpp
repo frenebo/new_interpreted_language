@@ -18,6 +18,10 @@ namespace syntax_tree_printer::terminal_expressions
         {
             print_bool_literal_expression(std::get<syntax_tree::terminal_expressions::BoolLiteralExpression>(contained), indents);
         }
+        else if (std::holds_alternative<syntax_tree::terminal_expressions::StringLiteralExpression>(contained))
+        {
+            print_string_literal_expression(std::get<syntax_tree::terminal_expressions::StringLiteralExpression>(contained), indents);
+        }
         else
         {
             std::cout << std::string(indents, ' ') << "Unimplemented terminal print\n";

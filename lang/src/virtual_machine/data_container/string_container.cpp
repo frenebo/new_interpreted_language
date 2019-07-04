@@ -2,12 +2,12 @@
 
 namespace virtual_machine::data_container
 {
-    IntegerContainer::IntegerContainer(long value)
+    StringContainer::StringContainer(std::string value)
     : _value(value)
     {
     }
 
-    long IntegerContainer::value() const
+    const std::string & StringContainer::value() const
     {
         return _value;
     }
