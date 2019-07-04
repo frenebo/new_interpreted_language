@@ -35,7 +35,7 @@ namespace front_end
         if (std::holds_alternative<parser::ParseError>(parse_result))
         {
             parser::ParseError parse_err = std::get<parser::ParseError>(parse_result);
-            return FrontEndError(parse_err.message());
+            return FrontEndError(parse_err.problem());
         }
         else
         {

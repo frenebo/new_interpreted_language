@@ -1,5 +1,14 @@
 
+first = 1;
+second = 1;
+
+print first;
+print second;
+
 for (i = 0; i < 10; i += 1)
 {
-    print i;
+    new_second = first + second;
+    first = second;
+    second = new_second;
+    print second;
 }

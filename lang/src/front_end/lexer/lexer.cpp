@@ -59,7 +59,7 @@ namespace lexer
         }
 
         // Add an End Of Input token to the end
-        result.push_back(tokens::Token(tokens::TokenType::END_OF_INPUT, ""));
+        result.push_back(tokens::Token(tokens::TokenType::END_OF_INPUT, text.size(), ""));
 
         return result;
     }
@@ -172,12 +172,12 @@ namespace lexer
         // if there was a period somewhere, this is a float
         if (seen_period)
         {
-            return tokens::Token(tokens::TokenType::FLOAT_NUM, matched_str);
+            return tokens::Token(tokens::TokenType::FLOAT_NUM, start_idx, matched_str);
         }
         // if there was no period, this is an int
         else
         {
-            return tokens::Token(tokens::TokenType::INTEGER_NUM, matched_str);
+            return tokens::Token(tokens::TokenType::INTEGER_NUM, start_idx, matched_str);
         }
     }
 
@@ -198,7 +198,7 @@ namespace lexer
 
         std::string matched_str = text.substr(start_idx, match_length);
 
-        return tokens::Token(tokens::TokenType::IDENTIFIER, matched_str);
+        return tokens::Token(tokens::TokenType::IDENTIFIER, start_idx, matched_str);
     }
 
     std::optional<tokens::Token> Lexer::try_match_whitespace(const std::string & text, const unsigned long start_idx) const
@@ -220,7 +220,7 @@ namespace lexer
         {
             std::string matched_str = text.substr(start_idx, match_length);
 
-            return tokens::Token(tokens::TokenType::WHITESPACE, matched_str);
+            return tokens::Token(tokens::TokenType::WHITESPACE, start_idx, matched_str);
         }
     }
 
@@ -248,7 +248,7 @@ namespace lexer
                 continue;
             }
 
-            longest_match = tokens::Token(pair.second, pair.first);
+            longest_match = tokens::Token(pair.second, start_idx, pair.first);
         }
 
         return longest_match;

@@ -40,12 +40,14 @@ namespace tokens
     class Token
     {
     public:
-        Token(TokenType token_type, std::string content_text);
+        Token(TokenType token_type, unsigned long start_idx, std::string content_text);
 
         TokenType token_type() const;
+        unsigned long start_idx() const;
         const std::string & content_text() const;
     private:
         TokenType _token_type;
+        unsigned long _start_idx;
         std::string _content_text;
     };
 }

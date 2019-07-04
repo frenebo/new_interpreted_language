@@ -14,7 +14,8 @@ namespace parser::terminal_expressions
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::INTEGER_NUM) +
                 " or " + tokens::tok_type_to_str(tokens::TokenType::FLOAT_NUM) +
-                ", got " + tokens::tok_type_to_str(next_token_type)
+                ", got " + tokens::tok_type_to_str(next_token_type),
+                tokens[start_idx]
             );
         }
 

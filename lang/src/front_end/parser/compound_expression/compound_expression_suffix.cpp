@@ -7,7 +7,7 @@ namespace parser::compound_expression
     {
         // parse operator
         syntax_tree::compound_expression::OperatorType op_type;
-        
+
         tokens::TokenType next_token_type = tokens[start_idx].token_type();
         if (next_token_type == tokens::TokenType::PLUS_SIGN)
         {
@@ -59,16 +59,16 @@ namespace parser::compound_expression
         }
         else
         {
-            return ParseError("Unexpected token " + tokens::tok_type_to_str(next_token_type));
+            return ParseError("Unexpected token " + tokens::tok_type_to_str(next_token_type), tokens[start_idx]);
         }
 
         // for the operator
         unsigned long consumed_count = 1;
-        
+
         // parse the terminal after the operator
         auto try_parse_possibly_prefixed_terminal_exp =
             parse_possibly_prefixed_terminal(tokens, start_idx + consumed_count);
-        
+
         if (std::holds_alternative<ParseError>(try_parse_possibly_prefixed_terminal_exp))
         {
             return std::get<ParseError>(try_parse_possibly_prefixed_terminal_exp);
@@ -76,7 +76,7 @@ namespace parser::compound_expression
 
         auto parse_possibly_prefixed_terminal_exp_result =
             std::get<ParseResult<syntax_tree::compound_expression::PossiblyPrefixedTerminal>>(try_parse_possibly_prefixed_terminal_exp);
-        
+
         consumed_count += parse_possibly_prefixed_terminal_exp_result.consumed_count();
         auto possibly_prefixed_terminal_exp = parse_possibly_prefixed_terminal_exp_result.contained();
 

@@ -65,8 +65,9 @@ namespace tokens
         }
     }
 
-    Token::Token(TokenType token_type, std::string content_text)
+    Token::Token(TokenType token_type, unsigned long start_idx, std::string content_text)
     : _token_type(token_type),
+    _start_idx(start_idx),
     _content_text(content_text)
     {
     }
@@ -74,6 +75,11 @@ namespace tokens
     TokenType Token::token_type() const
     {
         return _token_type;
+    }
+
+    unsigned long Token::start_idx() const
+    {
+        return _start_idx;
     }
 
     const std::string & Token::content_text() const

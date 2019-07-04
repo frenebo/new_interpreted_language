@@ -8,7 +8,7 @@ namespace parser::statements
     {
         auto try_parse_compound_exp =
             parser::compound_expression::parse_compound_expression(tokens, start_idx, tokens::TokenType::SEMICOLON);
-        
+
         if (std::holds_alternative<ParseError>(try_parse_compound_exp))
         {
             return std::get<ParseError>(try_parse_compound_exp);
@@ -16,7 +16,7 @@ namespace parser::statements
 
         auto parse_compound_exp_result =
             std::get<ParseResult<syntax_tree::compound_expression::CompoundExpression>>(try_parse_compound_exp);
-        
+
         unsigned long consumed_count = parse_compound_exp_result.consumed_count();
         auto compound_exp = parse_compound_exp_result.contained();
 
@@ -25,7 +25,8 @@ namespace parser::statements
         if (expect_semicolon_type != tokens::TokenType::SEMICOLON)
         {
             return ParseError(
-                "Expected " + tokens::tok_type_to_str(tokens::TokenType::SEMICOLON) + ", got " + tokens::tok_type_to_str(expect_semicolon_type)
+                "Expected " + tokens::tok_type_to_str(tokens::TokenType::SEMICOLON) + ", got " + tokens::tok_type_to_str(expect_semicolon_type),
+                tokens[start_idx + consumed_count]
             );
         }
 

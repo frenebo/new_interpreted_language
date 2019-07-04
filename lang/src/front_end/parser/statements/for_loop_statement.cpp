@@ -15,7 +15,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::FOR_KEYWORD) +
-                ", got " + tokens::tok_type_to_str(expect_for_keyword)
+                ", got " + tokens::tok_type_to_str(expect_for_keyword),
+                tokens[start_idx + consumed_count]
             );
         }
         // for the "for" keyword
@@ -27,7 +28,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::OPEN_PARENTHESIS) +
-                ", got " + tokens::tok_type_to_str(expect_open_paren_token)
+                ", got " + tokens::tok_type_to_str(expect_open_paren_token),
+                tokens[start_idx + consumed_count]
             );
         }
         // for the open parenthesis
@@ -52,7 +54,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::SEMICOLON) +
-                ", got " + tokens::tok_type_to_str(expect_semicolon_0)
+                ", got " + tokens::tok_type_to_str(expect_semicolon_0),
+                tokens[start_idx + consumed_count]
             );
         }
         // for the semicolon
@@ -77,7 +80,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::SEMICOLON) +
-                ", got " + tokens::tok_type_to_str(expect_semicolon_1)
+                ", got " + tokens::tok_type_to_str(expect_semicolon_1),
+                tokens[start_idx + consumed_count]
             );
         }
         // for the semicolon
@@ -89,8 +93,8 @@ namespace parser::statements
         if (std::holds_alternative<ParseError>(try_parse_increment_exp))
         {
             ParseError exp_parse_err = std::get<ParseError>(try_parse_increment_exp);
-            std::string message = "Could not parse for loop increment expression: " + exp_parse_err.message();
-            return ParseError(message);
+            std::string problem = "Could not parse for loop increment expression: " + exp_parse_err.problem();
+            return ParseError(problem, exp_parse_err.error_token());
         }
         auto parse_increment_exp_result =
             std::get<ParseResult<syntax_tree::compound_expression::CompoundExpression>>(try_parse_increment_exp);
@@ -104,7 +108,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::CLOSE_PARENTHESIS) +
-                ", got " + tokens::tok_type_to_str(expect_close_parenthesis)
+                ", got " + tokens::tok_type_to_str(expect_close_parenthesis),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment the consumed count for the close parenthesis
@@ -116,7 +121,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::OPEN_BRACE) +
-                ", got " + tokens::tok_type_to_str(expect_open_brace)
+                ", got " + tokens::tok_type_to_str(expect_open_brace),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment consumed count for the open brace
@@ -127,7 +133,7 @@ namespace parser::statements
         // the parser should stop looking for statements at the close brace
         auto try_parse_for_loop_body =
             parser::statement_series::parse_statement_series(tokens, start_idx + consumed_count, tokens::TokenType::CLOSE_BRACE);
-        
+
         if (std::holds_alternative<ParseError>(try_parse_for_loop_body))
         {
             return std::get<ParseError>(try_parse_for_loop_body);
@@ -145,7 +151,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::CLOSE_BRACE) +
-                ", got " + tokens::tok_type_to_str(expect_close_brace)
+                ", got " + tokens::tok_type_to_str(expect_close_brace),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment consumed count for the close brace
@@ -157,7 +164,7 @@ namespace parser::statements
             increment_exp,
             for_loop_body_statement_series
         );
-        
+
         return ParseResult<syntax_tree::statements::ForLoopStatement>(for_loop_statement, consumed_count);
     }
 }

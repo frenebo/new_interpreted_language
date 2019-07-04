@@ -3,15 +3,19 @@
 
 #include <string>
 
+#include "../tokens/tokens.hpp"
+
 namespace parser
 {
     class ParseError
     {
     public:
-        ParseError(std::string message);
-        const std::string & message() const;
+        ParseError(std::string problem, tokens::Token error_token);
+        const std::string & problem() const;
+        const tokens::Token & error_token() const;
     private:
-        std::string _message;
+        std::string _problem;
+        tokens::Token _error_token;
     };
 }
 

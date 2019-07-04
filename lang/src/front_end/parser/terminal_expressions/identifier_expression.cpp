@@ -12,7 +12,8 @@ namespace parser::terminal_expressions
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(next_token_type) + ", got " +
-                tokens::tok_type_to_str(next_token_type)
+                tokens::tok_type_to_str(next_token_type),
+                tokens[start_idx]
             );
         }
 

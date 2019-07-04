@@ -16,7 +16,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::IF_KEYWORD) +
-                ", got " + tokens::tok_type_to_str(expect_if_keyword_tok)
+                ", got " + tokens::tok_type_to_str(expect_if_keyword_tok),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment consumed count for the if keyword
@@ -28,7 +29,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::OPEN_PARENTHESIS) +
-                ", got " + tokens::tok_type_to_str(expect_open_parenthesis_tok)
+                ", got " + tokens::tok_type_to_str(expect_open_parenthesis_tok),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment consumed count for the open parenthesis
@@ -38,7 +40,7 @@ namespace parser::statements
         // the parser should stop parsing at the close parenthesis
         auto try_parse_condition_expression =
             parser::compound_expression::parse_compound_expression(tokens, start_idx + consumed_count, tokens::TokenType::CLOSE_PARENTHESIS);
-        
+
         if (std::holds_alternative<ParseError>(try_parse_condition_expression))
         {
             return std::get<ParseError>(try_parse_condition_expression);
@@ -47,7 +49,7 @@ namespace parser::statements
         auto parse_condition_expression_result =
             std::get<ParseResult<syntax_tree::compound_expression::CompoundExpression>>(try_parse_condition_expression);
         auto condition_expression = parse_condition_expression_result.contained();
-        
+
         // increase consumed count by the number of tokens in the condition expression
         consumed_count += parse_condition_expression_result.consumed_count();
 
@@ -57,7 +59,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::CLOSE_PARENTHESIS) +
-                ", got " + tokens::tok_type_to_str(expect_close_parenthesis)
+                ", got " + tokens::tok_type_to_str(expect_close_parenthesis),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment consumed count for the close parenthesis
@@ -69,7 +72,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::OPEN_BRACE) +
-                ", got " + tokens::tok_type_to_str(expect_open_brace)
+                ", got " + tokens::tok_type_to_str(expect_open_brace),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment consumed count for the open brace
@@ -79,7 +83,7 @@ namespace parser::statements
         // the parser should stop looking for statements at the close brace
         auto try_parse_if_body =
             parser::statement_series::parse_statement_series(tokens, start_idx + consumed_count, tokens::TokenType::CLOSE_BRACE);
-        
+
         if (std::holds_alternative<ParseError>(try_parse_if_body))
         {
             return std::get<ParseError>(try_parse_if_body);
@@ -97,7 +101,8 @@ namespace parser::statements
         {
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::CLOSE_BRACE) +
-                ", got " + tokens::tok_type_to_str(expect_close_brace)
+                ", got " + tokens::tok_type_to_str(expect_close_brace),
+                tokens[start_idx + consumed_count]
             );
         }
         // increment consumed count for the close brace

@@ -13,7 +13,8 @@ namespace parser::terminal_expressions
             return ParseError(
                 "Expected " + tokens::tok_type_to_str(tokens::TokenType::TRUE_KEYWORD) +
                 " or " = tokens::tok_type_to_str(tokens::TokenType::FALSE_KEYWORD) +
-                ", got " + tokens::tok_type_to_str(expect_true_or_false_token)
+                ", got " + tokens::tok_type_to_str(expect_true_or_false_token),
+                tokens[start_idx]
             );
         }
 
@@ -21,7 +22,7 @@ namespace parser::terminal_expressions
 
         // for the true or false keyword token
         unsigned long consumed_count = 1;
-        
+
         return ParseResult<syntax_tree::terminal_expressions::BoolLiteralExpression>(
             syntax_tree::terminal_expressions::BoolLiteralExpression(value),
             consumed_count

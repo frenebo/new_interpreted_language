@@ -11,7 +11,7 @@ namespace parser::terminal_expressions
         {
             auto try_parse_identifier =
                 parse_identifier_expression(tokens, start_idx);
-            
+
             if (std::holds_alternative<ParseError>(try_parse_identifier))
             {
                 return std::get<ParseError>(try_parse_identifier);
@@ -20,7 +20,7 @@ namespace parser::terminal_expressions
             auto parse_identifier_expression_result = std::get<ParseResult<syntax_tree::terminal_expressions::IdentifierExpression>>(try_parse_identifier);
             unsigned long consumed_count = parse_identifier_expression_result.consumed_count();
             auto identifier_expression = parse_identifier_expression_result.contained();
-            
+
             auto terminal_exp_container = syntax_tree::terminal_expressions::TerminalExpressionContainer(identifier_expression);
 
             return ParseResult<syntax_tree::terminal_expressions::TerminalExpressionContainer>(terminal_exp_container, consumed_count);
@@ -30,7 +30,7 @@ namespace parser::terminal_expressions
         {
             auto try_parse_identifier =
                 parse_number_expression(tokens, start_idx);
-            
+
             if (std::holds_alternative<ParseError>(try_parse_identifier))
             {
                 return std::get<ParseError>(try_parse_identifier);
@@ -67,7 +67,10 @@ namespace parser::terminal_expressions
         }
         else
         {
-            return ParseError("Expected expression token, got " + tokens::tok_type_to_str(next_tok_type));
+            return ParseError(
+                "Expected expression token, got " + tokens::tok_type_to_str(next_tok_type),
+                tokens[start_idx]
+            );
         }
     }
 }
