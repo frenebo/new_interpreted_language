@@ -21,6 +21,7 @@ namespace bytecode_compiler
             case syntax_tree::compound_expression::OperatorType::AND_OP:
                 return 2;
             case syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP:
+            case syntax_tree::compound_expression::OperatorType::NOT_EQUALS_COMPARISON_OP:
                 return 3;
             case syntax_tree::compound_expression::OperatorType::LESS_THAN_OP:
             case syntax_tree::compound_expression::OperatorType::LESS_THAN_OR_EQUAL_OP:
@@ -284,6 +285,15 @@ namespace bytecode_compiler
             {
                 instructions.push_back(bytecode::instructions::InstructionContainer(
                     bytecode::instructions::StackCompareEqualTo()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::NOT_EQUALS_COMPARISON_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareEqualTo()
+                ));
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackApplyNot()
                 ));
             }
             else if (op_type == syntax_tree::compound_expression::OperatorType::MODULO_OP)

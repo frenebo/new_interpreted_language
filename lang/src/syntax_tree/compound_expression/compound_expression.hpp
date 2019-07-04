@@ -34,6 +34,7 @@ namespace syntax_tree::compound_expression
         MORE_THAN_OP,
         MORE_THAN_OR_EQUAL_OP,
         EQUALITY_COMPARISON_OP,
+        NOT_EQUALS_COMPARISON_OP,
         AND_OP,
         OR_OP,
     };

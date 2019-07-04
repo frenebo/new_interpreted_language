@@ -70,6 +70,8 @@ namespace tokens
             return "double vertical bar";
         case DOUBLE_AMPERSAND:
             return "double ampersand";
+        case NOT_EQUALS:
+            return "not equals";
         default:
             return "unimplemented token string";
         }

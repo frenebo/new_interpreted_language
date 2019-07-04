@@ -57,6 +57,10 @@ namespace parser::compound_expression
         {
             op_type = syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP;
         }
+        else if (next_token_type == tokens::TokenType::NOT_EQUALS)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::NOT_EQUALS_COMPARISON_OP;
+        }
         else if (next_token_type == tokens::TokenType::PERCENT_SIGN)
         {
             op_type = syntax_tree::compound_expression::OperatorType::MODULO_OP;

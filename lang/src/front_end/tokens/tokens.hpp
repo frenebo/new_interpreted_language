@@ -35,6 +35,7 @@ namespace tokens
         MORE_THAN_OP,
         MORE_THAN_OR_EQUAL_OP,
         DOUBLE_EQUALS,
+        NOT_EQUALS,
         DOUBLE_VERTICAL_BAR,
         DOUBLE_AMPERSAND,
         END_OF_INPUT,
