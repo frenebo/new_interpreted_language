@@ -28,6 +28,7 @@ namespace bytecode_compiler
                 return 3;
             case syntax_tree::compound_expression::OperatorType::MULT_OP:
             case syntax_tree::compound_expression::OperatorType::DIV_OP:
+            case syntax_tree::compound_expression::OperatorType::MODULO_OP:
                 return 4;
         }
         return BytecodeCompilerError("Unimplemented op type priority\n");
@@ -261,6 +262,12 @@ namespace bytecode_compiler
                 ));
                 instructions.push_back(bytecode::instructions::InstructionContainer(
                     bytecode::instructions::StackApplyNot()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::MODULO_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackModuloOperation()
                 ));
             }
             else

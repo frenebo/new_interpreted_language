@@ -42,6 +42,10 @@ namespace syntax_tree_printer::compound_expression
             {
                 std::cout << std::string(indents + 1, ' ') << "Plus Equals Assignment Operator\n";
             }
+            else if (suffix.op_type() == syntax_tree::compound_expression::OperatorType::MODULO_OP)
+            {
+                std::cout << std::string(indents + 1, ' ') << "Modulo Operator";
+            }
             else
             {
                 std::cout << std::string(indents + 1, ' ') << "Unimplemented operator print\n";

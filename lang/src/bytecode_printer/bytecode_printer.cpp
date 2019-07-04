@@ -85,6 +85,10 @@ namespace bytecode_printer
         {
             std::cout << "STACK APPLY NOT OPERATION\n";
         }
+        else if (std::holds_alternative<bytecode::instructions::StackModuloOperation>(contained_instruction))
+        {
+            std::cout << "STACK MODULO OPERATION\n";
+        }
         else if (std::holds_alternative<bytecode::instructions::StackBoolPushConst>(contained_instruction))
         {
             auto bool_push_const_instruction = std::get<bytecode::instructions::StackBoolPushConst>(contained_instruction);

@@ -9,11 +9,11 @@ namespace syntax_tree_printer::terminal_expressions
         std::string num_type_str = "Unimplemented number type";
         if (number_exp.number_type() == syntax_tree::terminal_expressions::NumberExpression::NumberType::FLOAT)
         {
-            num_type_str = "Float";
+            num_type_str = "Float ";
         }
         else if (number_exp.number_type() == syntax_tree::terminal_expressions::NumberExpression::NumberType::INT)
         {
-            num_type_str = "Integer";
+            num_type_str = "Integer ";
         }
 
         std::cout << std::string(indents, ' ') << num_type_str + number_exp.number_string() + "\n";

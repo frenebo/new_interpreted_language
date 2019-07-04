@@ -42,6 +42,8 @@ namespace tokens
             return "print keyword";
         case IF_KEYWORD:
             return "if keyword";
+        case ELSE_KEYWORD:
+            return "else keyword";
         case FOR_KEYWORD:
             return "for keyword";
         case END_OF_INPUT:
@@ -62,6 +64,8 @@ namespace tokens
             return "false keyword";
         case STRING_LITERAL:
             return "string literal";
+        case PERCENT_SIGN:
+            return "percent sign";
         default:
             return "unimplemented token string";
         }

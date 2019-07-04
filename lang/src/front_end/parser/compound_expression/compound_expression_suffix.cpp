@@ -57,6 +57,10 @@ namespace parser::compound_expression
         {
             op_type = syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP;
         }
+        else if (next_token_type == tokens::TokenType::PERCENT_SIGN)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::MODULO_OP;
+        }
         else
         {
             return ParseError("Unexpected token " + tokens::tok_type_to_str(next_token_type), tokens[start_idx]);

@@ -25,6 +25,7 @@ namespace syntax_tree::compound_expression
         MINUS_OP,
         MULT_OP,
         DIV_OP,
+        MODULO_OP,
         ASSIGNMENT_OP,
         MINUS_EQUALS_ASSIGNMENT_OP,
         PLUS_EQUALS_ASSIGNMENT_OP,
@@ -45,7 +46,7 @@ namespace syntax_tree::compound_expression
         OperatorType _op_type;
         PossiblyPrefixedTerminal _terminal_exp;
     };
-    
+
     class CompoundExpression
     {
     public:

@@ -15,6 +15,7 @@ namespace bytecode::instructions
     class StackCompareLessThan {};
     class StackCompareLessThanOrEqualTo {};
     class StackApplyNot {};
+    class StackModuloOperation {};
 
     class StackBoolPushConst
     {
@@ -99,6 +100,7 @@ namespace bytecode::instructions
             StackCompareLessThan,
             StackCompareLessThanOrEqualTo,
             StackApplyNot,
+            StackModuloOperation,
             StackIntegerPushConst,
             StackFloatPushConst,
             StackBoolPushConst,

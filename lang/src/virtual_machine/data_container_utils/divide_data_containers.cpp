@@ -13,7 +13,7 @@ namespace virtual_machine::data_container_utils
         bool lhs_is_number = lhs_is_int || lhs_is_float;
         bool rhs_is_number = rhs_is_int || rhs_is_float;
 
-        // number addition
+        // number division
         if (lhs_is_number && rhs_is_number)
         {
             float lhs_val;
@@ -43,7 +43,7 @@ namespace virtual_machine::data_container_utils
         else
         {
             return TypeError(
-                "Incompatible addition types: " + data_container::data_container_type_string(lhs) + " and " +
+                "Invalid division types: " + data_container::data_container_type_string(lhs) + " and " +
                 data_container::data_container_type_string(rhs)
             );
         }

@@ -15,6 +15,7 @@ namespace lexer
             { "+",     tokens::TokenType::PLUS_SIGN },
             { "*",     tokens::TokenType::ASTERISK },
             { "/",     tokens::TokenType::FORWARD_SLASH },
+            { "%",     tokens::TokenType::PERCENT_SIGN },
             { ";",     tokens::TokenType::SEMICOLON },
             { "(",     tokens::TokenType::OPEN_PARENTHESIS },
             { ")",     tokens::TokenType::CLOSE_PARENTHESIS },
@@ -27,8 +28,9 @@ namespace lexer
             { "==",    tokens::TokenType::DOUBLE_EQUALS },
             { "print", tokens::TokenType::PRINT_KEYWORD },
             { "if",    tokens::TokenType::IF_KEYWORD },
+            { "else",  tokens::TokenType::ELSE_KEYWORD },
             { "for",   tokens::TokenType::FOR_KEYWORD },
-            { "true", tokens::TokenType::TRUE_KEYWORD },
+            { "true",  tokens::TokenType::TRUE_KEYWORD },
             { "false", tokens::TokenType::FALSE_KEYWORD },
         };
     }

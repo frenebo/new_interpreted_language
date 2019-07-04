@@ -129,6 +129,10 @@ namespace virtual_machine::machine_state
         {
             return execute_stack_apply_not();
         }
+        else if (std::holds_alternative<bytecode::instructions::StackModuloOperation>(current_instruction))
+        {
+            return execute_stack_apply_modulo();
+        }
         else if (std::holds_alternative<bytecode::instructions::StackBoolPushConst>(current_instruction))
         {
             bool push_val = std::get<bytecode::instructions::StackBoolPushConst>(current_instruction).value();
@@ -232,6 +236,33 @@ namespace virtual_machine::machine_state
         data_container::DataContainer result_container = std::get<data_container::DataContainer>(try_get_not_val);
 
         _data_stack.push(result_container);
+
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_apply_modulo()
+    {
+        auto rhs_container_optional = _data_stack.pop();
+        auto lhs_container_optional = _data_stack.pop();
+
+        if (!(rhs_container_optional.has_value() && lhs_container_optional.has_value()))
+        {
+            return MachineRuntimeError("Stack error - ran out of values");
+        }
+
+        auto try_modulo = data_container_utils::modulo_data_containers(*lhs_container_optional, *rhs_container_optional);
+
+        if (std::holds_alternative<data_container_utils::TypeError>(try_modulo))
+        {
+            auto type_error = std::get<data_container_utils::TypeError>(try_modulo);
+            return MachineRuntimeError("Type Error: " + type_error.problem());
+        }
+
+        auto value_container = std::get<data_container::DataContainer>(try_modulo);
+
+        _data_stack.push(value_container);
 
         _instruction_memory.set_position(_instruction_memory.position() + 1);
 
