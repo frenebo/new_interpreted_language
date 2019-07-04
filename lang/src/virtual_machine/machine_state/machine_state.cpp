@@ -145,6 +145,14 @@ namespace virtual_machine::machine_state
 
             return execute_stack_string_push_const(push_val);
         }
+        else if (std::holds_alternative<bytecode::instructions::StackAndOperation>(current_instruction))
+        {
+            return execute_stack_and_operation();
+        }
+        else if (std::holds_alternative<bytecode::instructions::StackOrOperation>(current_instruction))
+        {
+            return execute_stack_or_operation();
+        }
         else
         {
             return MachineRuntimeError("UNIMPLEMENTED INSTRUCTION");
@@ -221,6 +229,51 @@ namespace virtual_machine::machine_state
         return std::optional<MachineRuntimeError>();
     }
 
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_and_operation()
+    {
+        auto try_get_rhs = _data_stack.pop();
+        auto try_get_lhs = _data_stack.pop();
+
+        if (!try_get_lhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
+
+        auto try_get_op_result = data_container_utils::and_op(*try_get_lhs, *try_get_rhs);
+        if (std::holds_alternative<data_container_utils::TypeError>(try_get_op_result))
+        {
+            data_container_utils::TypeError type_err = std::get<data_container_utils::TypeError>(try_get_op_result);
+            return MachineRuntimeError("Type Error: " + type_err.problem());
+        }
+
+        data_container::DataContainer result_container = std::get<data_container::DataContainer>(try_get_op_result);
+
+        _data_stack.push(result_container);
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
+    }
+
+    std::optional<MachineRuntimeError> MachineState::execute_stack_or_operation()
+    {
+        auto try_get_rhs = _data_stack.pop();
+        auto try_get_lhs = _data_stack.pop();
+
+        if (!try_get_lhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
+
+        auto try_get_op_result = data_container_utils::or_op(*try_get_lhs, *try_get_rhs);
+        if (std::holds_alternative<data_container_utils::TypeError>(try_get_op_result))
+        {
+            data_container_utils::TypeError type_err = std::get<data_container_utils::TypeError>(try_get_op_result);
+            return MachineRuntimeError("Type Error: " + type_err.problem());
+        }
+
+        data_container::DataContainer result_container = std::get<data_container::DataContainer>(try_get_op_result);
+
+        _data_stack.push(result_container);
+        _instruction_memory.set_position(_instruction_memory.position() + 1);
+
+        return std::optional<MachineRuntimeError>();
+    }
+
     std::optional<MachineRuntimeError> MachineState::execute_stack_apply_not()
     {
         auto try_get_stack_val = _data_stack.pop();
@@ -231,6 +284,7 @@ namespace virtual_machine::machine_state
         if (std::holds_alternative<data_container_utils::TypeError>(try_get_not_val))
         {
             data_container_utils::TypeError type_err = std::get<data_container_utils::TypeError>(try_get_not_val);
+            return MachineRuntimeError("Type Error: " + type_err.problem());
         }
 
         data_container::DataContainer result_container = std::get<data_container::DataContainer>(try_get_not_val);

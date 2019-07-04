@@ -61,6 +61,14 @@ namespace parser::compound_expression
         {
             op_type = syntax_tree::compound_expression::OperatorType::MODULO_OP;
         }
+        else if (next_token_type == tokens::TokenType::DOUBLE_AMPERSAND)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::AND_OP;
+        }
+        else if (next_token_type == tokens::TokenType::DOUBLE_VERTICAL_BAR)
+        {
+            op_type = syntax_tree::compound_expression::OperatorType::OR_OP;
+        }
         else
         {
             return ParseError("Unexpected token " + tokens::tok_type_to_str(next_token_type), tokens[start_idx]);

@@ -57,7 +57,7 @@ namespace virtual_machine::data_container_utils
         else
         {
             return TypeError(
-                "Incompatible subtract types: " + data_container::data_container_type_string(lhs) + " and " +
+                "Incompatible subtraction types: " + data_container::data_container_type_string(lhs) + " and " +
                 data_container::data_container_type_string(rhs)
             );
         }

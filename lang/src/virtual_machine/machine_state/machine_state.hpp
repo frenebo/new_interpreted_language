@@ -54,6 +54,8 @@ namespace virtual_machine::machine_state
         std::optional<MachineRuntimeError> execute_stack_compare_less_than_or_equal_to();
         std::optional<MachineRuntimeError> execute_stack_apply_not();
         std::optional<MachineRuntimeError> execute_stack_apply_modulo();
+        std::optional<MachineRuntimeError> execute_stack_and_operation();
+        std::optional<MachineRuntimeError> execute_stack_or_operation();
     };
 }
 

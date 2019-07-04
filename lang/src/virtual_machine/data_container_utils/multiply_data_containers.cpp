@@ -56,7 +56,7 @@ namespace virtual_machine::data_container_utils
         else
         {
             return TypeError(
-                "Incompatible addition types: " + data_container::data_container_type_string(lhs) + " and " +
+                "Incompatible multiplication types: " + data_container::data_container_type_string(lhs) + " and " +
                 data_container::data_container_type_string(rhs)
             );
         }

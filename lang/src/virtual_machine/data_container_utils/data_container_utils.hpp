@@ -24,7 +24,9 @@ namespace virtual_machine::data_container_utils
     std::variant<data_container::DataContainer, TypeError> modulo_data_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
     std::variant<data_container::DataContainer, TypeError> less_than_op_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
     std::variant<data_container::DataContainer, TypeError> less_than_or_equal_op_containers(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
-    std::variant<data_container::DataContainer, TypeError> get_value_not(const data_container::DataContainer & lhs);
+    std::variant<data_container::DataContainer, TypeError> get_value_not(const data_container::DataContainer & data);
+    std::variant<data_container::DataContainer, TypeError> and_op(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
+    std::variant<data_container::DataContainer, TypeError> or_op(const data_container::DataContainer & lhs, const data_container::DataContainer & rhs);
 
     std::variant<std::string, TypeError> convert_data_to_string(const data_container::DataContainer & data_container);
 }

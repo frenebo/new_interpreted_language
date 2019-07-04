@@ -7,6 +7,8 @@
 
 namespace bytecode::instructions
 {
+    class StackAndOperation {};
+    class StackOrOperation {};
     class StackAdd {};
     class StackSubtract {};
     class StackMultiply {};
@@ -93,6 +95,8 @@ namespace bytecode::instructions
     {
     public:
         typedef std::variant<
+            StackAndOperation,
+            StackOrOperation,
             StackAdd,
             StackSubtract,
             StackMultiply,

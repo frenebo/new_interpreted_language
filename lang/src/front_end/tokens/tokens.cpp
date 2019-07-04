@@ -66,6 +66,10 @@ namespace tokens
             return "string literal";
         case PERCENT_SIGN:
             return "percent sign";
+        case DOUBLE_VERTICAL_BAR:
+            return "double vertical bar";
+        case DOUBLE_AMPERSAND:
+            return "double ampersand";
         default:
             return "unimplemented token string";
         }

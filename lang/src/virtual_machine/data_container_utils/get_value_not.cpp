@@ -2,9 +2,9 @@
 
 namespace virtual_machine::data_container_utils
 {
-    std::variant<data_container::DataContainer, TypeError> get_value_not(const data_container::DataContainer & lhs)
+    std::variant<data_container::DataContainer, TypeError> get_value_not(const data_container::DataContainer & data)
     {
-        data_container::DataContainer::VariantDataContainer contained = lhs.contained();
+        data_container::DataContainer::VariantDataContainer contained = data.contained();
 
         if (std::holds_alternative<data_container::BoolContainer>(contained))
         {

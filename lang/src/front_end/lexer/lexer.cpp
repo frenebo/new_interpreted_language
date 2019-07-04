@@ -26,6 +26,8 @@ namespace lexer
             { ">",     tokens::TokenType::MORE_THAN_OP },
             { ">=",    tokens::TokenType::MORE_THAN_OR_EQUAL_OP },
             { "==",    tokens::TokenType::DOUBLE_EQUALS },
+            { "||",    tokens::TokenType::DOUBLE_VERTICAL_BAR },
+            { "&&",    tokens::TokenType::DOUBLE_AMPERSAND },
             { "print", tokens::TokenType::PRINT_KEYWORD },
             { "if",    tokens::TokenType::IF_KEYWORD },
             { "else",  tokens::TokenType::ELSE_KEYWORD },

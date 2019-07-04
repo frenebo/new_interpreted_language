@@ -16,20 +16,24 @@ namespace bytecode_compiler
             case syntax_tree::compound_expression::OperatorType::MINUS_EQUALS_ASSIGNMENT_OP:
             case syntax_tree::compound_expression::OperatorType::PLUS_EQUALS_ASSIGNMENT_OP:
                 return 0;
-            case syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP:
+            case syntax_tree::compound_expression::OperatorType::OR_OP:
                 return 1;
+            case syntax_tree::compound_expression::OperatorType::AND_OP:
+                return 2;
+            case syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP:
+                return 3;
             case syntax_tree::compound_expression::OperatorType::LESS_THAN_OP:
             case syntax_tree::compound_expression::OperatorType::LESS_THAN_OR_EQUAL_OP:
             case syntax_tree::compound_expression::OperatorType::MORE_THAN_OP:
             case syntax_tree::compound_expression::OperatorType::MORE_THAN_OR_EQUAL_OP:
-                return 2;
+                return 4;
             case syntax_tree::compound_expression::OperatorType::MINUS_OP:
             case syntax_tree::compound_expression::OperatorType::PLUS_OP:
-                return 3;
+                return 5;
             case syntax_tree::compound_expression::OperatorType::MULT_OP:
             case syntax_tree::compound_expression::OperatorType::DIV_OP:
             case syntax_tree::compound_expression::OperatorType::MODULO_OP:
-                return 4;
+                return 6;
         }
         return BytecodeCompilerError("Unimplemented op type priority\n");
     }
@@ -268,6 +272,18 @@ namespace bytecode_compiler
             {
                 instructions.push_back(bytecode::instructions::InstructionContainer(
                     bytecode::instructions::StackModuloOperation()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::AND_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackAndOperation()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::OR_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackOrOperation()
                 ));
             }
             else
