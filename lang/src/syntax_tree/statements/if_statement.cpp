@@ -7,7 +7,7 @@ namespace syntax_tree::statements
         syntax_tree::compound_expression::CompoundExpression if_condition,
         syntax_tree::statement_series::StatementSeries statement_series)
     : _if_condition(if_condition),
-    _body_statement_series(std::make_unique<syntax_tree::statement_series::StatementSeries>(statement_series))
+    _body_statement_series(ContainableStatementSeries(statement_series))
     {
     }
 
@@ -18,26 +18,6 @@ namespace syntax_tree::statements
 
     const syntax_tree::statement_series::StatementSeries & IfStatement::body_statement_series() const
     {
-        return *_body_statement_series;
-    }
-
-    IfStatement::~IfStatement()
-    {
-        _body_statement_series.reset(nullptr);
-    }
-
-    IfStatement::IfStatement(const IfStatement & rhs)
-    : _if_condition(rhs.if_condition()),
-    _body_statement_series(std::make_unique<syntax_tree::statement_series::StatementSeries>(rhs.body_statement_series()))
-    {
-    }
-
-    IfStatement & IfStatement::operator=(const IfStatement & rhs)
-    {
-        _if_condition = rhs.if_condition();
-        _body_statement_series.reset(nullptr);
-        _body_statement_series = std::make_unique<syntax_tree::statement_series::StatementSeries>(rhs.body_statement_series());
-
-        return *this;
+        return _body_statement_series.statement_series();
     }
 }

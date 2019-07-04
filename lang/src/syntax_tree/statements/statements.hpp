@@ -31,21 +31,38 @@ namespace syntax_tree::statements
         syntax_tree::compound_expression::CompoundExpression _compound_exp;
     };
 
+    /*
+     * This class is necessary because classes cannot contain each other
+     *
+     * A statement series would contain statements, which would contain an if statement, which would
+     * contain a statement series, which would contain an if statement, etc.
+     *
+     * This way, the if statement will not contain a statement sequence in full, only
+     * a pointer to one.
+     */
+
+    class ContainableStatementSeries
+    {
+    public:
+        ContainableStatementSeries(syntax_tree::statement_series::StatementSeries statement_series);
+        const syntax_tree::statement_series::StatementSeries & statement_series() const;
+
+        ~ContainableStatementSeries();
+        ContainableStatementSeries(const ContainableStatementSeries &);
+        ContainableStatementSeries & operator=(const ContainableStatementSeries & rhs);
+    private:
+        std::unique_ptr<syntax_tree::statement_series::StatementSeries> _statement_series;
+    };
+
     class IfStatement
     {
     public:
         IfStatement(syntax_tree::compound_expression::CompoundExpression if_condition, syntax_tree::statement_series::StatementSeries body_statement_series);
         const syntax_tree::compound_expression::CompoundExpression & if_condition() const;
         const syntax_tree::statement_series::StatementSeries & body_statement_series() const;
-
-        ~IfStatement();
-        IfStatement(const IfStatement &);
-
-        IfStatement & operator=(const IfStatement & rhs);
     private:
         syntax_tree::compound_expression::CompoundExpression _if_condition;
-        // a pointer is used since a statement series can contain this class, and classes can't directly contain each other
-        std::unique_ptr<syntax_tree::statement_series::StatementSeries> _body_statement_series;
+        ContainableStatementSeries _body_statement_series;
     };
 
     class ForLoopStatement
@@ -61,16 +78,11 @@ namespace syntax_tree::statements
         const syntax_tree::compound_expression::CompoundExpression & condition_expression() const;
         const syntax_tree::compound_expression::CompoundExpression & increment_expression() const;
         const syntax_tree::statement_series::StatementSeries & loop_body() const;
-
-        ~ForLoopStatement();
-        ForLoopStatement(const ForLoopStatement &);
-        ForLoopStatement & operator=(const ForLoopStatement & rhs);
     private:
         syntax_tree::compound_expression::CompoundExpression _setup_expression;
         syntax_tree::compound_expression::CompoundExpression _condition_expression;
         syntax_tree::compound_expression::CompoundExpression _increment_expression;
-        // a pointer is used since a statement series can contain this class, and classes can't directly contain each other
-        std::unique_ptr<syntax_tree::statement_series::StatementSeries> _loop_body;
+        ContainableStatementSeries _loop_body;
     };
 
     class StatementContainer
