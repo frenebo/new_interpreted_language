@@ -51,7 +51,7 @@ namespace virtual_machine::machine_state
         std::optional<MachineRuntimeError> execute_goto_relative_instruction_location(int relative_pos);
         std::optional<MachineRuntimeError> execute_stack_duplicate();
         std::optional<MachineRuntimeError> execute_stack_compare_less_than();
-        std::optional<MachineRuntimeError> execute_stack_compare_less_than_or_equal_to();
+        std::optional<MachineRuntimeError> execute_stack_compare_equal_to();
         std::optional<MachineRuntimeError> execute_stack_apply_not();
         std::optional<MachineRuntimeError> execute_stack_apply_modulo();
         std::optional<MachineRuntimeError> execute_stack_and_operation();

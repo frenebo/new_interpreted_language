@@ -15,7 +15,7 @@ namespace bytecode::instructions
     class StackDivide {};
 
     class StackCompareLessThan {};
-    class StackCompareLessThanOrEqualTo {};
+    class StackCompareEqualTo {};
     class StackApplyNot {};
     class StackModuloOperation {};
 
@@ -102,7 +102,7 @@ namespace bytecode::instructions
             StackMultiply,
             StackDivide,
             StackCompareLessThan,
-            StackCompareLessThanOrEqualTo,
+            StackCompareEqualTo,
             StackApplyNot,
             StackModuloOperation,
             StackIntegerPushConst,

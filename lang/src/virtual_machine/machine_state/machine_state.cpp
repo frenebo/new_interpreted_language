@@ -121,9 +121,9 @@ namespace virtual_machine::machine_state
         {
             return execute_stack_compare_less_than();
         }
-        else if (std::holds_alternative<bytecode::instructions::StackCompareLessThanOrEqualTo>(current_instruction))
+        else if (std::holds_alternative<bytecode::instructions::StackCompareEqualTo>(current_instruction))
         {
-            return execute_stack_compare_less_than_or_equal_to();
+            return execute_stack_compare_equal_to();
         }
         else if (std::holds_alternative<bytecode::instructions::StackApplyNot>(current_instruction))
         {
@@ -205,7 +205,7 @@ namespace virtual_machine::machine_state
         return std::optional<MachineRuntimeError>();
     }
 
-    std::optional<MachineRuntimeError> MachineState::execute_stack_compare_less_than_or_equal_to()
+    std::optional<MachineRuntimeError> MachineState::execute_stack_compare_equal_to()
     {
         auto try_get_rhs = _data_stack.pop();
         auto try_get_lhs = _data_stack.pop();
@@ -213,7 +213,7 @@ namespace virtual_machine::machine_state
         if (!try_get_lhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
         if (!try_get_rhs.has_value()) return MachineRuntimeError("Stack error - ran out of values");
 
-        auto compare_result = data_container_utils::less_than_or_equal_op_containers(*try_get_lhs, *try_get_rhs);
+        auto compare_result = data_container_utils::equal_op_containers(*try_get_lhs, *try_get_rhs);
         if (std::holds_alternative<data_container_utils::TypeError>(compare_result))
         {
             data_container_utils::TypeError type_err = std::get<data_container_utils::TypeError>(compare_result);

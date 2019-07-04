@@ -245,14 +245,26 @@ namespace bytecode_compiler
             else if (op_type == syntax_tree::compound_expression::OperatorType::LESS_THAN_OR_EQUAL_OP)
             {
                 instructions.push_back(bytecode::instructions::InstructionContainer(
-                    bytecode::instructions::StackCompareLessThanOrEqualTo()
+                    bytecode::instructions::StackCompareLessThan()
+                ));
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareEqualTo()
+                ));
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackOrOperation()
                 ));
             }
             else if (op_type == syntax_tree::compound_expression::OperatorType::MORE_THAN_OP)
             {
                 // more than is the same as not less than or equal to
                 instructions.push_back(bytecode::instructions::InstructionContainer(
-                    bytecode::instructions::StackCompareLessThanOrEqualTo()
+                    bytecode::instructions::StackCompareLessThan()
+                ));
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareEqualTo()
+                ));
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackOrOperation()
                 ));
                 instructions.push_back(bytecode::instructions::InstructionContainer(
                     bytecode::instructions::StackApplyNot()
@@ -266,6 +278,12 @@ namespace bytecode_compiler
                 ));
                 instructions.push_back(bytecode::instructions::InstructionContainer(
                     bytecode::instructions::StackApplyNot()
+                ));
+            }
+            else if (op_type == syntax_tree::compound_expression::OperatorType::EQUALITY_COMPARISON_OP)
+            {
+                instructions.push_back(bytecode::instructions::InstructionContainer(
+                    bytecode::instructions::StackCompareEqualTo()
                 ));
             }
             else if (op_type == syntax_tree::compound_expression::OperatorType::MODULO_OP)
