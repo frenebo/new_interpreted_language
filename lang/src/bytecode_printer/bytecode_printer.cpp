@@ -101,6 +101,14 @@ namespace bytecode_printer
 
             std::cout << "PUSH STRING CONST: \"" << string_push_const_instruction.value() << "\"\n";
         }
+        else if (std::holds_alternative<bytecode::instructions::StackAndOperation>(contained_instruction))
+        {
+            std::cout << "STACK AND OPERATION\n";
+        }
+        else if (std::holds_alternative<bytecode::instructions::StackOrOperation>(contained_instruction))
+        {
+            std::cout << "STACK OR OPERATION\n";
+        }
         else
         {
             std::cout << "unimplemented bytecode instruction print\n";
