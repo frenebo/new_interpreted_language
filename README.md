@@ -10,7 +10,7 @@ Executable should now be in lang/build directory
 todo: 'or' should only evaluate first statement
 
 Example program in this language:
-
+`
 fizz = "Fizz";
 buzz = "Buzz";
 
@@ -33,3 +33,4 @@ for (i = 0; i < 100; i += 1)
         print i;
     }
 }
+`
