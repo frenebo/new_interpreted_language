@@ -10,7 +10,7 @@ namespace front_end
     std::variant<syntax_tree::statement_series::StatementSeries, FrontEndError>
     parse_program(const std::string & text)
     {
-        std::cout << "Input text: " << text << "\n";
+        std::cout << "Input text: " << std::endl << text << std::endl;
         auto lex_result = lexer::Lexer().lex_text(text);
 
         // if there was a problem lexing
